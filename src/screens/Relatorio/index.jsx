@@ -1,87 +1,147 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { Controller } from 'react-hook-form';
 import { Input } from '../../components/Inputs';
-import { Button } from '../../components/Buttons';
 import { styles } from './styles';
 import { useRelatorioScreen } from './useRelatorioScreen';
 
 export default function Relatorio() {
-  const { celula, control, handleSubmit, errors, onSubmit } = useRelatorioScreen();
+  const {
+    celula,
+    control,
+    errors,
+    filtradas,
+    totais,
+    formatDateBr,
+    openReuniao,
+    initialPeriod,
+  } = useRelatorioScreen();
 
   if (!celula) {
     return (
-      <View style={styles.container}>
+      <View style={styles.wrap}>
         <Text style={styles.error}>Célula não encontrada.</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>RELATÓRIO</Text>
-        <Text style={styles.subtitle}>{celula.nomeCelula}</Text>
+    <ScrollView
+      style={styles.scrollOuter}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={styles.title}>RELATÓRIO MENSAL</Text>
+      <Text style={styles.subtitle}>{celula.nomeCelula}</Text>
+      <Text style={styles.hint}>
+        Escolha o mês e o ano para ver as reuniões e totais.
+      </Text>
 
-        <Controller
-          control={control}
-          name="temaMinistrado"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Tema ministrado"
-              placeholder="Tema ministrado"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              error={errors.temaMinistrado?.message}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="textoBase"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Texto base"
-              placeholder="Texto base (opcional)"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="visitantes"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Visitantes"
-              placeholder="0"
-              value={value === 0 ? '' : String(value)}
-              onChangeText={(v) => onChange(v ? Number(v) : 0)}
-              onBlur={onBlur}
-              error={errors.visitantes?.message}
-              keyboardType="number-pad"
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="membrosPresentes"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <Input
-              label="Membros presentes"
-              placeholder="0"
-              value={value === 0 ? '' : String(value)}
-              onChangeText={(v) => onChange(v ? Number(v) : 0)}
-              onBlur={onBlur}
-              error={errors.membrosPresentes?.message}
-              keyboardType="number-pad"
-            />
-          )}
-        />
-        <Button title="SALVAR" onPress={handleSubmit(onSubmit)} />
+      <View style={styles.rowInputs}>
+        <View style={[styles.inputHalf, styles.inputHalfLeft]}>
+          <Controller
+            control={control}
+            name="mes"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                variant="auth"
+                placeholder="Mês (1–12)"
+                value={
+                  value === '' || value === undefined || value === null
+                    ? ''
+                    : String(value)
+                }
+                onChangeText={(v) => {
+                  const digits = v.replace(/[^\d]/g, '');
+                  if (digits === '') {
+                    onChange(initialPeriod.mes);
+                    return;
+                  }
+                  let n = Number(digits);
+                  if (n < 1) n = 1;
+                  if (n > 12) n = 12;
+                  onChange(n);
+                }}
+                onBlur={onBlur}
+                error={errors.mes?.message}
+                keyboardType="number-pad"
+              />
+            )}
+          />
+        </View>
+        <View style={[styles.inputHalf, styles.inputHalfRight]}>
+          <Controller
+            control={control}
+            name="ano"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                variant="auth"
+                placeholder="Ano (ex.: 2026)"
+                value={
+                  value === '' || value === undefined || value === null
+                    ? ''
+                    : String(value)
+                }
+                onChangeText={(v) => {
+                  const digits = v.replace(/[^\d]/g, '');
+                  if (digits === '') {
+                    onChange(initialPeriod.ano);
+                    return;
+                  }
+                  onChange(Number(digits));
+                }}
+                onBlur={onBlur}
+                error={errors.ano?.message}
+                keyboardType="number-pad"
+              />
+            )}
+          />
+        </View>
       </View>
+
+      <View style={styles.cardResumo}>
+        <Text style={styles.resumoTitulo}>Resumo do período</Text>
+        <Text style={styles.resumoLinha}>
+          Reuniões: <Text style={styles.resumoNum}>{totais.reunioes}</Text>
+        </Text>
+        <Text style={styles.resumoLinha}>
+          Total visitantes:{' '}
+          <Text style={styles.resumoNum}>{totais.visitantes}</Text>
+        </Text>
+        <Text style={styles.resumoLinha}>
+          Soma membros presentes:{' '}
+          <Text style={styles.resumoNum}>{totais.membrosPresentes}</Text>
+        </Text>
+      </View>
+
+      <Text style={styles.secReunioes}>Reuniões no mês</Text>
+      {filtradas.length === 0 ? (
+        <Text style={styles.empty}>
+          Nenhuma reunião neste mês.
+        </Text>
+      ) : (
+        filtradas.map((r) => (
+          <TouchableOpacity
+            key={r.id}
+            style={styles.reuniaoRow}
+            onPress={() => openReuniao(r)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.reuniaoData}>
+              {formatDateBr(r.dataReuniao)}
+            </Text>
+            <Text style={styles.reuniaoTema} numberOfLines={2}>
+              {r.temaMinistrado || '—'}
+            </Text>
+          </TouchableOpacity>
+        ))
+      )}
     </ScrollView>
   );
 }

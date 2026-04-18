@@ -17,6 +17,12 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2563eb',
   },
+  accent: {
+    backgroundColor: '#F28537',
+    borderRadius: 10,
+    paddingVertical: 16,
+    minHeight: 52,
+  },
   text: {
     fontSize: 16,
     fontWeight: '600',
@@ -26,5 +32,11 @@ export const styles = StyleSheet.create({
   },
   text_secondary: {
     color: '#2563eb',
+  },
+  text_accent: {
+    color: '#fff',
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
   },
 });

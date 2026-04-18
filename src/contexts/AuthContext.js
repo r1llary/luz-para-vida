@@ -3,6 +3,7 @@ import { isAppwriteConfigured } from '../lib/appwrite';
 import {
   signInWithAppwrite,
   signUpWithAppwrite,
+  updateProfileInAppwrite,
   signOutFromAppwrite,
   getCurrentUserFromAppwrite,
   restoreAppwriteSessionFromStorage,
@@ -90,15 +91,55 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    if (isAppwriteConfigured()) {
-      try {
+    try {
+      if (isAppwriteConfigured()) {
         await signOutFromAppwrite();
-      } catch (_) {
-        /* noop */
       }
+    } catch (_) {
+      /* sessão já pode estar inválida; seguimos para limpar estado local */
     }
     setUser(null);
   }, []);
+
+  const updateProfile = useCallback(async (payload) => {
+    if (!user) {
+      return { success: false, error: 'Nenhum usuário logado.' };
+    }
+    setLoading(true);
+    try {
+      if (isAppwriteConfigured()) {
+        try {
+          const u = await updateProfileInAppwrite(payload, user);
+          if (u) {
+            setUser(u);
+            return { success: true };
+          }
+          return {
+            success: false,
+            error: 'Não foi possível atualizar o perfil.',
+          };
+        } catch (error) {
+          return {
+            success: false,
+            error: error?.message || 'Erro ao atualizar perfil.',
+          };
+        }
+      }
+      setUser({
+        ...user,
+        nomeCompleto: payload.nomeCompleto,
+        email: payload.email,
+        dataNascimento: payload.dataNascimento,
+        endereco: payload.endereco,
+        fotoPerfilUrl: payload.removeFoto
+          ? null
+          : payload.fotoUri || user.fotoPerfilUrl,
+      });
+      return { success: true };
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   const value = {
     user,
@@ -107,6 +148,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     signIn,
     signUp,
+    updateProfile,
     signOut,
   };
 

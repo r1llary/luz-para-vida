@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -9,16 +10,17 @@ export function useRegistroMembroScreen() {
   const { params } = useRoute();
   const celulaId = params?.celulaId;
   const { addMembro } = useCelulas();
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registroMembroSchema),
     defaultValues: {
       nomeCompleto: '',
-      cpfRg: '',
       email: '',
       telefone: '',
       rua: '',
@@ -31,10 +33,24 @@ export function useRegistroMembroScreen() {
     },
   });
 
-  const onSubmit = (data) => {
-    addMembro(data, celulaId);
-    navigation.goBack();
-  };
+  const onSubmit = useCallback(
+    async (data) => {
+      if (!celulaId) return;
+      setSubmitting(true);
+      try {
+        const payload = { ...data, cpfRg: '' };
+        await addMembro(payload, celulaId);
+        navigation.goBack();
+      } catch (e) {
+        setError('root', {
+          message: e?.message || 'Não foi possível cadastrar o membro.',
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [addMembro, celulaId, navigation, setError],
+  );
 
   return {
     celulaId,
@@ -42,5 +58,6 @@ export function useRegistroMembroScreen() {
     handleSubmit,
     errors,
     onSubmit,
+    submitting,
   };
 }

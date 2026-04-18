@@ -14,6 +14,28 @@ function ensureConfig() {
   return isAppwriteDatabaseConfigured();
 }
 
+function parseMembrosPresentesIdsFromDoc(doc) {
+  const raw = doc.membrosPresentesIds;
+  if (Array.isArray(raw)) return raw.filter(Boolean);
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const p = JSON.parse(raw);
+      return Array.isArray(p) ? p.filter(Boolean) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+  return [];
+}
+
+function mapReuniaoDocument(doc) {
+  const n = normalizeDocument(doc);
+  return {
+    ...n,
+    membrosPresentesIds: parseMembrosPresentesIdsFromDoc(n),
+  };
+}
+
 /**
  * Células do usuário logado.
  */
@@ -52,6 +74,58 @@ export async function createCelulaAppwrite(userId, celula) {
     }
   );
   return id;
+}
+
+/**
+ * Reuniões de célula (collection `relatorios`: um documento por reunião).
+ * Atributo `dataReuniao`: string YYYY-MM-DD (identificador junto à célula).
+ */
+export async function listReunioesByCelulaAppwrite(celulaId) {
+  if (!ensureConfig() || !celulaId) return [];
+  const d = db();
+  if (!d) return [];
+  try {
+    const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.relatorios, [
+      Query.equal('celulaId', [celulaId]),
+      Query.orderDesc('dataReuniao'),
+    ]);
+    return (res.documents || []).map(mapReuniaoDocument);
+  } catch (_) {
+    const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.relatorios, [
+      Query.equal('celulaId', [celulaId]),
+      Query.orderDesc('$createdAt'),
+    ]);
+    return (res.documents || []).map(mapReuniaoDocument);
+  }
+}
+
+export async function createReuniaoAppwrite(celulaId, dados) {
+  if (!ensureConfig() || !celulaId) return null;
+  const d = db();
+  if (!d) return null;
+  const docId = ID.unique();
+  const ids = Array.isArray(dados.membrosPresentesIds)
+    ? dados.membrosPresentesIds.filter(Boolean)
+    : [];
+  const membrosCount =
+    ids.length > 0 ? ids.length : Number(dados.membrosPresentes) || 0;
+  const basePayload = {
+    celulaId,
+    dataReuniao: dados.dataReuniao ?? '',
+    temaMinistrado: dados.temaMinistrado ?? '',
+    textoBase: dados.textoBase ?? '',
+    visitantes: Number(dados.visitantes) || 0,
+    membrosPresentes: membrosCount,
+  };
+  try {
+    await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, {
+      ...basePayload,
+      membrosPresentesIds: JSON.stringify(ids),
+    });
+  } catch (_) {
+    await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, basePayload);
+  }
+  return docId;
 }
 
 /**
@@ -95,50 +169,18 @@ export async function createMembroAppwrite(celulaId, membro) {
   return id;
 }
 
-/**
- * Relatórios (um por célula; atualizamos o mais recente ou criamos).
- */
+/** @deprecated use listReunioesByCelulaAppwrite */
 export async function getRelatorioAppwrite(celulaId) {
-  if (!ensureConfig()) return null;
-  const d = db();
-  if (!d) return null;
-  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.relatorios, [
-    Query.equal('celulaId', [celulaId]),
-    Query.orderDesc('$createdAt'),
-    Query.limit(1),
-  ]);
-  const doc = res.documents?.[0];
-  return doc ? normalizeDocument(doc) : null;
+  const list = await listReunioesByCelulaAppwrite(celulaId);
+  return list[0] || null;
 }
 
+/** @deprecated use createReuniaoAppwrite */
 export async function saveRelatorioAppwrite(celulaId, dados) {
-  if (!ensureConfig()) return null;
-  const d = db();
-  if (!d) return null;
-  const existing = await getRelatorioAppwrite(celulaId);
-  const payload = {
-    temaMinistrado: dados.temaMinistrado ?? '',
-    textoBase: dados.textoBase ?? '',
-    visitantes: Number(dados.visitantes) || 0,
-    membrosPresentes: Number(dados.membrosPresentes) || 0,
-  };
-  if (existing) {
-    await d.updateDocument(
-      DATABASE_ID,
-      COLLECTION_IDS.relatorios,
-      existing.id,
-      payload
-    );
-    return existing.id;
-  }
-  const id = ID.unique();
-  await d.createDocument(
-    DATABASE_ID,
-    COLLECTION_IDS.relatorios,
-    id,
-    { celulaId, ...payload }
-  );
-  return id;
+  return createReuniaoAppwrite(celulaId, {
+    ...dados,
+    dataReuniao: dados.dataReuniao || new Date().toISOString().slice(0, 10),
+  });
 }
 
 function normalizeDocument(doc) {

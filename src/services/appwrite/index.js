@@ -1,6 +1,7 @@
 export {
   signInWithAppwrite,
   signUpWithAppwrite,
+  updateProfileInAppwrite,
   signOutFromAppwrite,
   getCurrentUserFromAppwrite,
   getAvatarViewUrl,
@@ -12,6 +13,8 @@ export {
   createCelulaAppwrite,
   listMembrosByCelulaAppwrite,
   createMembroAppwrite,
+  listReunioesByCelulaAppwrite,
+  createReuniaoAppwrite,
   getRelatorioAppwrite,
   saveRelatorioAppwrite,
 } from './databaseService';

@@ -1,75 +1,175 @@
 import React, { useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
-import { Button } from '../../components/Buttons';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+  Image,
+  useWindowDimensions,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { styles } from './styles';
 import { useMinhasCelulasScreen } from './useMinhasCelulasScreen';
 
+const LOGO_HEADER = require('../../../assets/logo.png');
+
+function ScreenHeader({ onOpenMenu }) {
+  return (
+    <View style={styles.screenHeader}>
+      <TouchableOpacity
+        style={styles.menuBtn}
+        onPress={onOpenMenu}
+        accessibilityRole="button"
+        accessibilityLabel="Abrir menu"
+      >
+        <View>
+          <View style={styles.menuBar} />
+          <View style={styles.menuBar} />
+          <View style={[styles.menuBar, styles.menuBarLast]} />
+        </View>
+      </TouchableOpacity>
+      <Text style={styles.headerTitle} numberOfLines={1}>
+        Minhas Células
+      </Text>
+      <Image
+        source={LOGO_HEADER}
+        style={styles.headerLogo}
+        resizeMode="contain"
+        accessibilityIgnoresInvertColors
+      />
+    </View>
+  );
+}
+
+function ImagePlaceholder() {
+  return (
+    <View style={styles.placeholderInner}>
+      <View style={styles.placeholderRow}>
+        <View style={styles.placeholderSun} />
+        <View style={styles.placeholderMountain} />
+      </View>
+    </View>
+  );
+}
+
 export default function MinhasCelulas() {
   const {
-    user,
     celulas,
+    usandoMockLista,
     handleCadastrar,
-    confirmSignOut,
+    openDrawer,
     openDetalheCelula,
   } = useMinhasCelulasScreen();
+
+  const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
+  const PAD = 16;
+  const GAP = 12;
+  const cardWidth = (width - PAD * 2 - GAP) / 2;
+
+  const fabBottom = 20 + Math.max(insets.bottom, 8);
 
   const renderCelula = useCallback(
     ({ item }) => (
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, { width: cardWidth }]}
         onPress={() => openDetalheCelula(item)}
-        activeOpacity={0.7}
+        activeOpacity={0.9}
       >
-        <Text style={styles.cardTitle}>{item.nomeCelula}</Text>
-        <Text style={styles.cardSubtitle}>
-          {item.dia} • {item.horario}
-        </Text>
+        <View style={styles.cardImageWrap}>
+          {item.imagemUrl ? (
+            <Image
+              source={{ uri: item.imagemUrl }}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <ImagePlaceholder />
+          )}
+        </View>
+        <View style={styles.cardBody}>
+          <Text style={styles.cardNome} numberOfLines={2}>
+            {item.nomeCelula}
+          </Text>
+          <Text style={styles.cardDia} numberOfLines={2}>
+            {item.dia}
+          </Text>
+          <Text style={styles.cardHorario} numberOfLines={1}>
+            {item.horario}
+          </Text>
+        </View>
       </TouchableOpacity>
     ),
-    [openDetalheCelula],
+    [cardWidth, openDetalheCelula],
+  );
+
+  const ListFooter = useCallback(
+    () => (
+      <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+    ),
+    [],
+  );
+
+  const renderFab = () => (
+    <TouchableOpacity
+      style={[styles.fab, { right: 20, bottom: fabBottom }]}
+      onPress={handleCadastrar}
+      activeOpacity={0.9}
+      accessibilityRole="button"
+      accessibilityLabel="Cadastrar nova célula"
+    >
+      <Text style={styles.fabPlus}>+</Text>
+    </TouchableOpacity>
   );
 
   if (celulas.length === 0) {
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.userText}>Olá, {user?.nomeCompleto || user?.email}</Text>
-          <TouchableOpacity onPress={confirmSignOut}>
-            <Text style={styles.sair}>Sair</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>Minhas Células</Text>
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <StatusBar style="light" />
+        <ScreenHeader onOpenMenu={openDrawer} />
+        <ScrollView
+          style={styles.scrollFlex}
+          contentContainerStyle={styles.emptyScrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.emptyTitle}>Nenhuma célula cadastrada</Text>
           <Text style={styles.emptyText}>
-            Você não possui Células cadastradas
+            Use o botão + para registrar sua primeira célula.
           </Text>
-          <Text style={styles.emptyHint}>
-            Toque no botão abaixo para cadastrar sua primeira célula
-          </Text>
-          <Button title="Cadastrar" onPress={handleCadastrar} />
-        </View>
-      </View>
+          <ListFooter />
+        </ScrollView>
+        {renderFab()}
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.userText}>Olá, {user?.nomeCompleto || user?.email}</Text>
-        <TouchableOpacity onPress={confirmSignOut}>
-          <Text style={styles.sair}>Sair</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.listHeader}>
-        <Text style={styles.listTitle}>Minhas Células</Text>
-        <Button title="Cadastrar" onPress={handleCadastrar} variant="secondary" />
-      </View>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+      <StatusBar style="light" />
+      <ScreenHeader onOpenMenu={openDrawer} />
+      {__DEV__ && usandoMockLista ? (
+        <Text style={[styles.mockHint, { paddingHorizontal: 16, paddingBottom: 6 }]}>
+          Lista de teste — mockFlags.js (USE_CELULAS_LIST_MOCK)
+        </Text>
+      ) : null}
       <FlatList
+        style={styles.listFlex}
         data={celulas}
         keyExtractor={(item) => item.id}
         renderItem={renderCelula}
-        contentContainerStyle={styles.list}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrap}
+        ListFooterComponent={ListFooter}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       />
-    </View>
+      {renderFab()}
+    </SafeAreaView>
   );
 }

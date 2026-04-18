@@ -4,9 +4,6 @@ export const registroMembroSchema = z.object({
   nomeCompleto: z
     .string()
     .min(3, 'Nome deve ter no mínimo 3 caracteres'),
-  cpfRg: z
-    .string()
-    .min(1, 'CPF ou RG é obrigatório'),
   email: z
     .string()
     .min(1, 'Email é obrigatório')

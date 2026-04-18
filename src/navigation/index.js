@@ -17,7 +17,7 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer key={isAuthenticated ? 'main' : 'auth'}>
       {isAuthenticated ? <MainStack /> : <AuthStack />}
     </NavigationContainer>
   );

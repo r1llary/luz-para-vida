@@ -155,6 +155,110 @@ export async function signUpWithAppwrite(profile) {
   return getCurrentUserFromAppwrite();
 }
 
+/**
+ * Atualiza perfil (Appwrite Account + documento usuarios + foto opcional).
+ * Requer senha atual ao alterar email ou senha de acesso.
+ *
+ * @param {object} payload
+ * @param {string} payload.nomeCompleto
+ * @param {string} payload.dataNascimento
+ * @param {string} payload.endereco
+ * @param {string} payload.email
+ * @param {string} [payload.fotoUri]
+ * @param {string} [payload.novaSenha]
+ * @param {string} [payload.senhaAtual]
+ * @param {object} currentUser usuário atual do contexto (id, email, fotoPerfil, …)
+ */
+export async function updateProfileInAppwrite(payload, currentUser) {
+  if (!isAppwriteConfigured() || !currentUser?.id) return null;
+  const account = getAppwriteAccount();
+  const databases = getAppwriteDatabases();
+  if (!account) return null;
+
+  const userId = currentUser.id;
+  const {
+    nomeCompleto,
+    dataNascimento,
+    endereco,
+    email,
+    fotoUri,
+    removeFoto,
+    novaSenha,
+    senhaAtual,
+  } = payload;
+
+  const emailTrim = (email || '').trim();
+  const emailChanged =
+    emailTrim.toLowerCase() !==
+    (currentUser.email || '').trim().toLowerCase();
+  const passwordChange = !!(novaSenha && String(novaSenha).length >= 6);
+
+  if (emailChanged || passwordChange) {
+    const s = senhaAtual != null ? String(senhaAtual).trim() : '';
+    if (!s) {
+      throw new Error(
+        'Informe sua senha atual para alterar email ou senha.'
+      );
+    }
+  }
+
+  if (emailChanged) {
+    await account.updateEmail(emailTrim, senhaAtual);
+  }
+
+  if (passwordChange) {
+    await account.updatePassword(novaSenha, senhaAtual);
+  }
+
+  const nameTrim = (nomeCompleto || '').trim();
+  if (nameTrim) {
+    await account.updateName(nameTrim);
+  }
+
+  let fotoPerfilId = currentUser.fotoPerfil || '';
+  if (removeFoto) {
+    fotoPerfilId = '';
+  } else if (fotoUri && BUCKET_AVATARS_ID) {
+    try {
+      const id = await uploadAvatarFromUri(fotoUri, userId);
+      if (id) fotoPerfilId = id;
+    } catch (_) {
+      /* mantém foto anterior */
+    }
+  }
+
+  if (databases && DATABASE_ID && COLLECTION_IDS.usuarios) {
+    const docPayload = {
+      nomeCompleto: nameTrim,
+      email: emailTrim,
+      dataNascimento: (dataNascimento || '').trim(),
+      endereco: (endereco || '').trim(),
+      fotoPerfil: fotoPerfilId || '',
+    };
+    try {
+      await databases.updateDocument(
+        DATABASE_ID,
+        COLLECTION_IDS.usuarios,
+        userId,
+        docPayload,
+      );
+    } catch (err) {
+      await databases.createDocument(
+        DATABASE_ID,
+        COLLECTION_IDS.usuarios,
+        userId,
+        {
+          userId,
+          ...docPayload,
+          permissao: 'membro',
+        },
+      );
+    }
+  }
+
+  return getCurrentUserFromAppwrite();
+}
+
 export async function signOutFromAppwrite() {
   if (!isAppwriteConfigured()) return;
   const account = getAppwriteAccount();

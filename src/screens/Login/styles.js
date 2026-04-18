@@ -1,52 +1,75 @@
 import { StyleSheet } from 'react-native';
 
+export const BG = '#CDAA6D';
+
 export const styles = StyleSheet.create({
-  container: {
+  safe: {
+    flex: 1,
+    backgroundColor: BG,
+  },
+  kav: {
+    flex: 1,
+    width: '100%',
+  },
+  scroll: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#f8fafc',
+    alignItems: 'stretch',
+    width: '100%',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    paddingBottom: 28,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+  inner: {
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1e293b',
-    textAlign: 'center',
-    marginBottom: 4,
+  logoSpacer: {
+    marginBottom: 28,
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#64748b',
-    textAlign: 'center',
-    marginBottom: 24,
+  fieldBlock: {
+    marginBottom: 8,
   },
   errorRoot: {
-    color: '#c53030',
+    color: '#7f1d1d',
     fontSize: 14,
-    marginBottom: 12,
+    marginBottom: 14,
     textAlign: 'center',
+    fontWeight: '600',
+    backgroundColor: 'rgba(255,255,255,0.35)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  btnWrap: {
+    marginTop: 8,
+    width: '100%',
   },
   link: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginTop: 24,
+    paddingHorizontal: 4,
   },
-  linkText: { fontSize: 14, color: '#64748b' },
-  linkBold: { fontSize: 14, fontWeight: '700', color: '#2563eb' },
+  linkText: { fontSize: 15, color: 'rgba(255,255,255,0.95)' },
+  linkBold: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
   footer: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: 'rgba(255,255,255,0.75)',
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: 28,
+    paddingHorizontal: 16,
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 400,
   },
 });
