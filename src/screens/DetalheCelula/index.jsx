@@ -1,14 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Modal,
-  Pressable,
-  Alert,
-} from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -62,54 +53,17 @@ export default function DetalheCelula() {
     celula,
     membros,
     reunioes,
-    user,
     formatDateBr,
     openNovaReuniao,
     openDetalheReuniao,
     openRegistroMembro,
     openEditarCelula,
     openMenu,
-    opcoesLideranca,
-    canEditLideranca,
     canEditCelula,
-    updateCelulaFields,
   } = useDetalheCelulaScreen();
 
   const insets = useSafeAreaInsets();
   const bottomPad = Math.max(insets.bottom, 10);
-
-  const [liderModalOpen, setLiderModalOpen] = useState(false);
-  const [draftLider, setDraftLider] = useState('');
-  const [draftCo, setDraftCo] = useState('');
-
-  useEffect(() => {
-    if (!liderModalOpen || !celula) return;
-    setDraftLider(celula.liderUserId || user?.id || '');
-    setDraftCo(celula.coLiderUserId || '');
-  }, [liderModalOpen, celula, user?.id]);
-
-  const opcoesCoLider = opcoesLideranca.filter((o) => o.id !== draftLider);
-
-  const onSaveLideranca = useCallback(async () => {
-    if (!celula?.id) return;
-    if (draftCo && draftCo === draftLider) {
-      Alert.alert('Validação', 'Co-líder deve ser outra pessoa além do líder.');
-      return;
-    }
-    if (!draftLider) {
-      Alert.alert('Validação', 'Selecione o líder da célula.');
-      return;
-    }
-    try {
-      await updateCelulaFields(celula.id, {
-        liderUserId: draftLider,
-        coLiderUserId: draftCo || '',
-      });
-      setLiderModalOpen(false);
-    } catch (e) {
-      Alert.alert('Erro', e?.message || 'Não foi possível salvar.');
-    }
-  }, [celula?.id, draftLider, draftCo, updateCelulaFields]);
 
   if (!celula) {
     return (
@@ -177,24 +131,13 @@ export default function DetalheCelula() {
 
         <View style={[styles.sectionHeaderRow, styles.sectionHeaderRowFirst]}>
           <Text style={styles.sectionTitleInline}>Membros</Text>
-          <View style={styles.sectionHeaderLinks}>
-            {canEditLideranca ? (
-              <TouchableOpacity
-                onPress={() => setLiderModalOpen(true)}
-                accessibilityRole="button"
-                accessibilityLabel="Alterar líder e co-líder"
-              >
-                <Text style={styles.sectionLink}>Alterar liderança</Text>
-              </TouchableOpacity>
-            ) : null}
-            <TouchableOpacity
-              onPress={openRegistroMembro}
-              accessibilityRole="button"
-              accessibilityLabel="Adicionar membro"
-            >
-              <Text style={styles.sectionLink}>Adicionar membro</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={openRegistroMembro}
+            accessibilityRole="button"
+            accessibilityLabel="Adicionar membro"
+          >
+            <Text style={styles.sectionLink}>Adicionar membro</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.divider} />
 
@@ -258,7 +201,10 @@ export default function DetalheCelula() {
               activeOpacity={0.85}
             >
               <Text style={styles.reuniaoData}>
-                {formatDateBr(r.dataReuniao) || r.dataReuniao}
+                {formatDateBr(r.dataReuniao || r.data) ||
+                  r.dataReuniao ||
+                  r.data ||
+                  '—'}
               </Text>
               <Text style={styles.reuniaoTema} numberOfLines={2}>
                 {r.temaMinistrado || '—'}
@@ -281,84 +227,6 @@ export default function DetalheCelula() {
           </TouchableOpacity>
         </View>
       ) : null}
-
-      <Modal
-        visible={liderModalOpen}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setLiderModalOpen(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setLiderModalOpen(false)}
-        >
-          <Pressable
-            style={[styles.modalCard, { paddingBottom: Math.max(insets.bottom, 16) }]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text style={styles.modalTitle}>Líder e co-líder</Text>
-            <Text style={styles.modalHint}>
-              Escolha entre você e os membros que já têm usuário (campo userId).
-            </Text>
-
-            <View style={styles.modalSection}>
-              <Text style={styles.modalSectionLabel}>Líder</Text>
-              {opcoesLideranca.map((o) => (
-                <TouchableOpacity
-                  key={o.id}
-                  style={[
-                    styles.modalOption,
-                    draftLider === o.id && styles.modalOptionOn,
-                  ]}
-                  onPress={() => setDraftLider(o.id)}
-                >
-                  <Text style={styles.modalOptionText}>{o.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <View style={styles.modalSection}>
-              <Text style={styles.modalSectionLabel}>Co-líder</Text>
-              <TouchableOpacity
-                style={[
-                  styles.modalOption,
-                  !draftCo && styles.modalOptionOn,
-                ]}
-                onPress={() => setDraftCo('')}
-              >
-                <Text style={styles.modalOptionText}>Nenhum</Text>
-              </TouchableOpacity>
-              {opcoesCoLider.map((o) => (
-                <TouchableOpacity
-                  key={o.id}
-                  style={[
-                    styles.modalOption,
-                    draftCo === o.id && styles.modalOptionOn,
-                  ]}
-                  onPress={() => setDraftCo(o.id)}
-                >
-                  <Text style={styles.modalOptionText}>{o.label}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                onPress={() => setLiderModalOpen(false)}
-                style={styles.modalBtnPad}
-              >
-                <Text style={styles.liderancaBtnText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={onSaveLideranca}
-                style={styles.modalBtnPad}
-              >
-                <Text style={styles.liderancaBtnText}>Salvar</Text>
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   );
 }

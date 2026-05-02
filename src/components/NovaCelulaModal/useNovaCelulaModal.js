@@ -12,7 +12,9 @@ export function useNovaCelulaModal({ visible, onClose, onCreated }) {
   const { user } = useAuth();
   const { addCelula, celulas } = useCelulas();
   const [submitting, setSubmitting] = useState(false);
-  const [imagemUri, setImagemUri] = useState(null);
+  /** uri + mime + nome — necessários para upload Storage no Android (content://). */
+  const [imagemAsset, setImagemAsset] = useState(null);
+  const imagemUri = imagemAsset?.uri ?? null;
   const [diaModalOpen, setDiaModalOpen] = useState(false);
   const [celulaRaizModalOpen, setCelulaRaizModalOpen] = useState(false);
   const [timePickerOpen, setTimePickerOpen] = useState(false);
@@ -57,7 +59,7 @@ export function useNovaCelulaModal({ visible, onClose, onCreated }) {
         horario: '',
         celulaRaiz: '',
       });
-      setImagemUri(null);
+      setImagemAsset(null);
       setDiaModalOpen(false);
       setCelulaRaizModalOpen(false);
       setTimePickerOpen(false);
@@ -74,7 +76,12 @@ export function useNovaCelulaModal({ visible, onClose, onCreated }) {
       quality: 0.85,
     });
     if (!result.canceled && result.assets[0]) {
-      setImagemUri(result.assets[0].uri);
+      const a = result.assets[0];
+      setImagemAsset({
+        uri: a.uri,
+        mimeType: a.mimeType || 'image/jpeg',
+        fileName: a.fileName || 'image.jpg',
+      });
     }
   }, []);
 
@@ -87,11 +94,16 @@ export function useNovaCelulaModal({ visible, onClose, onCreated }) {
       quality: 0.85,
     });
     if (!result.canceled && result.assets[0]) {
-      setImagemUri(result.assets[0].uri);
+      const a = result.assets[0];
+      setImagemAsset({
+        uri: a.uri,
+        mimeType: a.mimeType || 'image/jpeg',
+        fileName: a.fileName || 'image.jpg',
+      });
     }
   }, []);
 
-  const clearImagem = useCallback(() => setImagemUri(null), []);
+  const clearImagem = useCallback(() => setImagemAsset(null), []);
 
   const selectDia = useCallback(
     (label) => {
@@ -151,6 +163,8 @@ export function useNovaCelulaModal({ visible, onClose, onCreated }) {
           horario: data.horario,
           celulaRaiz: (data.celulaRaiz || '').trim(),
           imagemUri,
+          imagemMimeType: imagemAsset?.mimeType,
+          imagemFileName: imagemAsset?.fileName,
         });
         if (result?.id) {
           onCreated({
@@ -177,7 +191,7 @@ export function useNovaCelulaModal({ visible, onClose, onCreated }) {
         setSubmitting(false);
       }
     },
-    [addCelula, imagemUri, onClose, onCreated, setError],
+    [addCelula, imagemAsset, imagemUri, onClose, onCreated, setError],
   );
 
   return {

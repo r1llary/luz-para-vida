@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
-import { Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCelulas } from '../../contexts/CelulasContext';
 import { CELULA_RELATORIO_TODAS_ID } from '../../constants/relatorio';
 import { filterCelulasParaRelatorio } from '../../utils/celulaRelatorio';
 import { formatIsoDateBr, localDateToIso, todayIsoDate } from '../../utils/brFormat';
+import { buildRelatorioPdfHtml } from '../../utils/relatorioPdfHtml';
+import { shareRelatorioPdf } from '../../utils/shareRelatorioPdf';
+import { computeFrequenciaStats } from '../../utils/relatorioFrequenciaStats';
 
 function monthBoundsIso() {
   const now = new Date();
@@ -15,48 +18,6 @@ function monthBoundsIso() {
     inicio: localDateToIso(start),
     fim: localDateToIso(end),
   };
-}
-
-function countPresencasReuniao(r) {
-  const ids = r.membrosPresentesIds;
-  if (Array.isArray(ids) && ids.length > 0) return ids.length;
-  return Number(r.membrosPresentes) || 0;
-}
-
-function visitantesStatsFromReunioes(reunioes) {
-  const nomeToReuniaoIds = new Map();
-  let registros = 0;
-
-  reunioes.forEach((r) => {
-    const lista = Array.isArray(r.visitantesLista) ? r.visitantesLista : [];
-    if (lista.length > 0) {
-      registros += lista.length;
-      lista.forEach((v) => {
-        const key = String(v?.nome ?? '')
-          .trim()
-          .toLowerCase();
-        if (!key) return;
-        if (!nomeToReuniaoIds.has(key)) nomeToReuniaoIds.set(key, new Set());
-        nomeToReuniaoIds.get(key).add(r.id);
-      });
-    } else {
-      registros += Number(r.visitantes) || 0;
-    }
-  });
-
-  let visitantesRecorrentes = 0;
-  nomeToReuniaoIds.forEach((ids) => {
-    if (ids.size > 1) visitantesRecorrentes += 1;
-  });
-
-  const comNome = nomeToReuniaoIds.size > 0;
-  const numeroVisitantes = comNome ? nomeToReuniaoIds.size : registros;
-
-  return { numeroVisitantes, visitantesRecorrentes, registrosVisitantes: registros };
-}
-
-function membrosCountForCelula(celulaId, membrosGlobal) {
-  return membrosGlobal.filter((m) => m.celulaId === celulaId).length;
 }
 
 export function useRelatoriosListaScreen() {
@@ -178,59 +139,112 @@ export function useRelatoriosListaScreen() {
     });
   }, [reunioesCelula, periodoOrdenado]);
 
-  const frequenciaStats = useMemo(() => {
-    let totalMembros;
-    if (isTodasCelulas) {
-      totalMembros = elegiveis.reduce(
-        (s, c) => s + membrosCountForCelula(c.id, membrosGlobal),
-        0
-      );
-    } else {
-      totalMembros = membrosLista.length;
-    }
-    const somaPresencas = reunioesNoPeriodo.reduce(
-      (s, r) => s + countPresencasReuniao(r),
-      0
-    );
-    const reunioesCount = reunioesNoPeriodo.length;
-    const totalSlots = totalMembros * reunioesCount;
-    const taxaFrequenciaPct =
-      totalSlots > 0
-        ? Math.round((1000 * somaPresencas) / totalSlots) / 10
-        : null;
-
-    const { numeroVisitantes, visitantesRecorrentes } =
-      visitantesStatsFromReunioes(reunioesNoPeriodo);
-
-    return {
-      totalMembros,
-      somaPresencas,
-      reunioesCount,
-      totalSlots,
-      taxaFrequenciaPct,
-      numeroVisitantes,
-      visitantesRecorrentes,
-    };
-  }, [
-    isTodasCelulas,
-    elegiveis,
-    membrosGlobal,
-    membrosLista.length,
-    reunioesNoPeriodo,
-  ]);
+  const frequenciaStats = useMemo(
+    () =>
+      computeFrequenciaStats({
+        isTodasCelulas,
+        elegiveis,
+        membrosGlobal,
+        membrosListaLength: membrosLista.length,
+        reunioesNoPeriodo,
+      }),
+    [
+      isTodasCelulas,
+      elegiveis,
+      membrosGlobal,
+      membrosLista.length,
+      reunioesNoPeriodo,
+    ],
+  );
 
   const openDrawer = useCallback(() => {
     navigation.dispatch(DrawerActions.openDrawer());
   }, [navigation]);
 
+  const gruposPdf = useMemo(() => {
+    if (!reunioesNoPeriodo.length) return [];
+    if (!isTodasCelulas && selectedCelula) {
+      return [
+        {
+          nomeCelula: selectedCelula.nomeCelula || '—',
+          reunioes: [...reunioesNoPeriodo].sort((a, b) =>
+            String(a.dataReuniao || a.data || '').localeCompare(
+              String(b.dataReuniao || b.data || ''),
+            ),
+          ),
+        },
+      ];
+    }
+    const nomeById = new Map(elegiveis.map((c) => [c.id, c.nomeCelula]));
+    const by = new Map();
+    reunioesNoPeriodo.forEach((r) => {
+      const cid = r.celulaId;
+      if (!by.has(cid)) by.set(cid, []);
+      by.get(cid).push(r);
+    });
+    return Array.from(by.entries())
+      .map(([cid, arr]) => ({
+        nomeCelula: nomeById.get(cid) || cid,
+        reunioes: arr.sort((a, b) =>
+          String(a.dataReuniao || a.data || '').localeCompare(
+            String(b.dataReuniao || b.data || ''),
+          ),
+        ),
+      }))
+      .sort((a, b) =>
+        String(a.nomeCelula).localeCompare(String(b.nomeCelula), 'pt-BR'),
+      );
+  }, [reunioesNoPeriodo, isTodasCelulas, selectedCelula, elegiveis]);
+
   const openRelatorioDetalhe = useCallback(() => {
-    if (!selectedCelula || isTodasCelulas) return;
+    const { inicio, fim } = periodoOrdenado;
+    if (!inicio || !fim) return;
+    if (isTodasCelulas) {
+      navigation.navigate('Relatorio', {
+        todasCelulas: true,
+        periodoInicio: inicio,
+        periodoFim: fim,
+      });
+      return;
+    }
+    if (!selectedCelula) return;
     navigation.navigate('Relatorio', {
       celula: selectedCelula,
-      periodoInicio: periodoOrdenado.inicio,
-      periodoFim: periodoOrdenado.fim,
+      periodoInicio: inicio,
+      periodoFim: fim,
     });
   }, [navigation, selectedCelula, isTodasCelulas, periodoOrdenado]);
+
+  const gerarPdfRelatorio = useCallback(async () => {
+    if (!reunioesNoPeriodo.length) {
+      Alert.alert(
+        'Relatório',
+        'Não há reuniões neste período para exportar.',
+      );
+      return;
+    }
+    const filtroLabel = isTodasCelulas
+      ? 'Todas as células (consolidado)'
+      : selectedCelula?.nomeCelula ?? '—';
+    try {
+      const html = buildRelatorioPdfHtml({
+        periodoOrdenado,
+        filtroLabel,
+        grupos: gruposPdf,
+        stats: frequenciaStats,
+      });
+      await shareRelatorioPdf(html);
+    } catch (_) {
+      /* shareRelatorioPdf já alerta */
+    }
+  }, [
+    reunioesNoPeriodo.length,
+    isTodasCelulas,
+    selectedCelula?.nomeCelula,
+    periodoOrdenado,
+    gruposPdf,
+    frequenciaStats,
+  ]);
 
   const openDatePicker = useCallback((field) => {
     setActiveDateField(field);
@@ -281,6 +295,7 @@ export function useRelatoriosListaScreen() {
     reunioesNoPeriodo,
     openDrawer,
     openRelatorioDetalhe,
+    gerarPdfRelatorio,
     openDatePicker,
     closeDatePicker,
     applyPickedDate,

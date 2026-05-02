@@ -116,4 +116,69 @@ export const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
     textAlign: 'center',
   },
+  chartCard: {
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  chartTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  chartSub: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.75)',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  chartStats: {
+    marginTop: 8,
+  },
+  chartStatLine: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#fff',
+    marginBottom: 4,
+  },
+  chartStatLabel: {
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
+  },
+  chartStatValue: {
+    fontWeight: '800',
+    color: '#fff',
+  },
+  pdfBtn: {
+    backgroundColor: '#F28537',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  pdfBtnDisabled: {
+    opacity: 0.5,
+  },
+  pdfBtnText: {
+    color: '#fff',
+    fontWeight: '800',
+    fontSize: 15,
+  },
+  grupoBlock: {
+    marginBottom: 18,
+  },
+  grupoTitulo: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 8,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.25)',
+  },
 });

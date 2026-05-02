@@ -132,7 +132,7 @@ export function CelulasProvider({ children }) {
         endereco: celula.endereco ?? '',
         celulaRaiz: celula.celulaRaiz ?? '',
         imagemDestaque: '',
-        membros: [],
+        membros: user?.id ? [user.id] : [],
         liderUserId: user?.id ?? '',
         coLiderUserId: '',
       };
@@ -148,16 +148,43 @@ export function CelulasProvider({ children }) {
                 uri,
                 id,
                 user.id,
+                celula.imagemMimeType,
+                celula.imagemFileName,
               );
               if (fileId) {
-                await updateCelulaAppwrite(id, { imagemDestaque: fileId });
-                imagemUrl = getAvatarViewUrl(fileId) || uri;
+                const previewUrl = getAvatarViewUrl(fileId) || null;
+                try {
+                  await updateCelulaAppwrite(id, { imagemDestaque: fileId });
+                } catch (e1) {
+                  if (previewUrl) {
+                    try {
+                      await updateCelulaAppwrite(id, {
+                        imagemDestaque: previewUrl,
+                      });
+                    } catch (e2) {
+                      if (typeof __DEV__ !== 'undefined' && __DEV__) {
+                        console.warn(
+                          '[addCelula] imagemDestaque não gravado',
+                          e1?.message,
+                          e2?.message,
+                        );
+                      }
+                    }
+                  } else if (typeof __DEV__ !== 'undefined' && __DEV__) {
+                    console.warn(
+                      '[addCelula] update imagemDestaque falhou',
+                      e1?.message,
+                    );
+                  }
+                }
+                imagemUrl = previewUrl || uri;
               } else {
                 imagemUrl = uri;
               }
             }
             const list = await listCelulasAppwrite(user.id);
             setCelulas(list);
+            await fetchMembrosForCelula(id);
             return { id, imagemUrl };
           }
         } catch (_) {
@@ -173,7 +200,7 @@ export function CelulasProvider({ children }) {
       setCelulas((prev) => [...prev, nova]);
       return { id: nova.id, imagemUrl: nova.imagemUrl };
     },
-    [user?.id]
+    [user?.id, fetchMembrosForCelula]
   );
 
   const addMembro = useCallback(

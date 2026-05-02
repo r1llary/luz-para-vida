@@ -178,6 +178,22 @@ export const styles = StyleSheet.create({
   linkBtnDisabled: {
     opacity: 0.55,
   },
+  pdfOutlineBtn: {
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 2,
+    borderColor: '#F28537',
+  },
+  pdfOutlineBtnText: {
+    color: '#c2410c',
+    fontWeight: '800',
+    fontSize: 15,
+    textAlign: 'center',
+    paddingHorizontal: 8,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',

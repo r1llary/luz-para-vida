@@ -34,7 +34,8 @@
           "cameraPermission": "O app usa a câmera para fotos de perfil e imagem de destaque da célula."
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-sharing"
     ]
   }
 }

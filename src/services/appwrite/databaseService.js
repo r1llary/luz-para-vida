@@ -25,6 +25,15 @@ function celulaImagemViewUrl(fileId) {
   return storage.getFileView(BUCKET_AVATARS_ID, fileId);
 }
 
+/** Valor salvo em `imagemDestaque`: ID do ficheiro OU URL completa (atributo tipo URL no console). */
+function celulaImagemDisplayUrl(stored) {
+  if (!stored || typeof stored !== 'string') return null;
+  const s = stored.trim();
+  if (!s) return null;
+  if (/^https?:\/\//i.test(s)) return s;
+  return celulaImagemViewUrl(s);
+}
+
 /** Array de strings no documento (nativo Appwrite ou JSON legado). */
 function parseStringArrayField(raw) {
   if (Array.isArray(raw)) return raw.filter(Boolean).map(String);
@@ -266,7 +275,8 @@ function mapCelulaDocument(doc) {
     membros: parseStringArrayField(n.membros),
     /** Não persistido no Appwrite; lista de reuniões vem só do contexto/cache. */
     reunioes: [],
-    imagemUrl: fileId ? celulaImagemViewUrl(fileId) : n.imagemUrl ?? null,
+    imagemUrl:
+      celulaImagemDisplayUrl(fileId) ?? n.imagemUrl ?? null,
   };
 }
 
@@ -283,6 +293,7 @@ function mapCelulaPartialToAppwrite(partial) {
     delete p.coLiderUserId;
   }
   if ('reunioes' in p) delete p.reunioes;
+  if ('imagemUrl' in p) delete p.imagemUrl;
   return p;
 }
 
@@ -291,9 +302,14 @@ export async function createCelulaAppwrite(userId, celula) {
   const d = db();
   if (!d) return null;
   const id = ID.unique();
-  const membrosInit = Array.isArray(celula.membros)
+  const rawMembros = Array.isArray(celula.membros)
     ? celula.membros.filter(Boolean).map(String)
     : [];
+  /** Criador da célula entra em `membros[]` para aparecer na lista (mesmo ID do Auth). */
+  const membrosInit =
+    userId && !rawMembros.includes(userId)
+      ? [...rawMembros, userId]
+      : rawMembros;
   const coliderVal = String(
     celula.coLiderUserId ?? celula.colider ?? '',
   ).trim();

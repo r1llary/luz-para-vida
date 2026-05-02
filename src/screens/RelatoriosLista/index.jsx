@@ -67,8 +67,10 @@ export default function RelatoriosLista() {
     dataFim,
     formatIsoDateBr,
     frequenciaStats,
+    reunioesNoPeriodo,
     openDrawer,
     openRelatorioDetalhe,
+    gerarPdfRelatorio,
     openDatePicker,
     closeDatePicker,
     applyPickedDate,
@@ -201,16 +203,28 @@ export default function RelatoriosLista() {
             </View>
 
             <TouchableOpacity
-              style={[styles.linkBtn, isTodasCelulas && styles.linkBtnDisabled]}
+              style={styles.linkBtn}
               onPress={openRelatorioDetalhe}
               activeOpacity={0.9}
-              disabled={isTodasCelulas}
-              accessibilityState={{ disabled: isTodasCelulas }}
+              accessibilityRole="button"
+              accessibilityLabel="Ver reuniões do período"
             >
-              <Text style={styles.linkBtnText}>
-                {isTodasCelulas
-                  ? 'Escolha uma célula para listar reuniões'
-                  : 'Ver reuniões do período'}
+              <Text style={styles.linkBtnText}>Ver reuniões do período</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.pdfOutlineBtn,
+                reunioesNoPeriodo.length === 0 && styles.linkBtnDisabled,
+              ]}
+              onPress={gerarPdfRelatorio}
+              disabled={reunioesNoPeriodo.length === 0}
+              activeOpacity={0.9}
+              accessibilityRole="button"
+              accessibilityLabel="Gerar relatório em PDF"
+            >
+              <Text style={styles.pdfOutlineBtnText}>
+                Gerar relatório em PDF
               </Text>
             </TouchableOpacity>
           </>

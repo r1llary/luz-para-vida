@@ -3,13 +3,9 @@ import { DrawerActions } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCelulas } from '../../contexts/CelulasContext';
+import { formatDateBr } from '../../utils/formatDateBr';
 
-export function formatDateBr(iso) {
-  if (!iso || typeof iso !== 'string') return '';
-  const [y, m, d] = iso.split('-');
-  if (!y || !m || !d) return String(iso);
-  return `${d}/${m}/${y}`;
-}
+export { formatDateBr };
 
 export function useDetalheCelulaScreen() {
   const navigation = useNavigation();
@@ -22,7 +18,6 @@ export function useDetalheCelulaScreen() {
     reunioes: reunioesGlobal,
     fetchMembrosForCelula,
     fetchReunioesForCelula,
-    updateCelulaFields,
   } = useCelulas();
 
   const celula = useMemo(() => {
@@ -49,35 +44,6 @@ export function useDetalheCelulaScreen() {
     fetchMembrosForCelula(celula.id);
     fetchReunioesForCelula(celula.id);
   }, [celula?.id, fetchMembrosForCelula, fetchReunioesForCelula]);
-
-  const resolveNomeUsuario = useCallback(
-    (userId) => {
-      if (!userId) return '—';
-      if (user?.id === userId) return user.nomeCompleto || 'Você';
-      const m = membros.find((x) => x.userId === userId);
-      if (m?.nomeCompleto) return m.nomeCompleto;
-      const id = String(userId);
-      return id.length > 12 ? `${id.slice(0, 8)}…` : id;
-    },
-    [user?.id, user?.nomeCompleto, membros]
-  );
-
-  const opcoesLideranca = useMemo(() => {
-    const map = new Map();
-    if (user?.id) {
-      map.set(user.id, user.nomeCompleto || 'Você');
-    }
-    membros.forEach((m) => {
-      if (m.userId && !map.has(m.userId)) {
-        map.set(m.userId, m.nomeCompleto || m.userId);
-      }
-    });
-    return Array.from(map.entries()).map(([id, label]) => ({ id, label }));
-  }, [user?.id, user?.nomeCompleto, membros]);
-
-  const canEditLideranca = Boolean(
-    celula && user?.id && celula.userId === user.id
-  );
 
   const canEditCelula = Boolean(
     celula && user?.id && celula.userId === user.id
@@ -116,17 +82,12 @@ export function useDetalheCelulaScreen() {
     celula,
     membros,
     reunioes,
-    user,
     formatDateBr,
     openNovaReuniao,
     openDetalheReuniao,
     openRegistroMembro,
     openEditarCelula,
     openMenu,
-    resolveNomeUsuario,
-    opcoesLideranca,
-    canEditLideranca,
     canEditCelula,
-    updateCelulaFields,
   };
 }

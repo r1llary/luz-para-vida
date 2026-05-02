@@ -32,7 +32,11 @@ export const COLLECTION_IDS = {
     'visitante',
 };
 
-/** Bucket Storage para fotos de perfil (criar no Console → Storage) */
+/**
+ * ID do bucket Storage (Console → Storage). Usado para fotos de perfil e para a
+ * imagem de destaque das células (`imagemDestaque` → `imagemUrl` na UI).
+ * Variável: EXPO_PUBLIC_APPWRITE_BUCKET_AVATARES (ex.: `imagens`).
+ */
 export const BUCKET_AVATARS_ID =
   env.EXPO_PUBLIC_APPWRITE_BUCKET_AVATARES || '';
 

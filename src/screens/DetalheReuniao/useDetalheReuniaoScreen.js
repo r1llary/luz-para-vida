@@ -1,13 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useRoute } from '@react-navigation/native';
 import { useCelulas } from '../../contexts/CelulasContext';
-
-function formatDateBr(iso) {
-  if (!iso || typeof iso !== 'string') return '';
-  const [y, m, d] = iso.split('-');
-  if (!y || !m || !d) return String(iso);
-  return `${d}/${m}/${y}`;
-}
+import { formatDateBr } from '../../utils/formatDateBr';
 
 export function useDetalheReuniaoScreen() {
   const { params } = useRoute();
