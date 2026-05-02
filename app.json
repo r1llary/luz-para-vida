@@ -30,9 +30,11 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "O app acessa suas fotos para a foto de perfil."
+          "photosPermission": "O app acessa suas fotos para imagens de perfil e da célula.",
+          "cameraPermission": "O app usa a câmera para fotos de perfil e imagem de destaque da célula."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ]
   }
 }

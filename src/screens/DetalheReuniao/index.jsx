@@ -39,7 +39,30 @@ export default function DetalheReuniao() {
 
         <View style={styles.row}>
           <Text style={styles.label}>Visitantes</Text>
-          <Text style={styles.value}>{String(reuniao.visitantes ?? 0)}</Text>
+          {Array.isArray(reuniao.visitantesLista) &&
+          reuniao.visitantesLista.length > 0 ? (
+            <View style={styles.presencaList}>
+              {reuniao.visitantesLista.map((v, idx) => (
+                <View key={`vis-${idx}`} style={styles.visitanteBlock}>
+                  <Text style={styles.presencaItem}>
+                    • {v.nome}
+                    {v.telefone ? ` — ${v.telefone}` : ''}
+                  </Text>
+                  {v.observacoes?.trim() ? (
+                    <Text style={styles.visitanteObs}>{v.observacoes.trim()}</Text>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={styles.value}>
+              {String(reuniao.visitantes ?? 0)}
+              {!reuniao.visitantesLista?.length &&
+              Number(reuniao.visitantes) > 0
+                ? ' (sem nomes registrados)'
+                : ''}
+            </Text>
+          )}
         </View>
 
         <View style={styles.row}>
@@ -70,8 +93,6 @@ export default function DetalheReuniao() {
           <Text style={styles.label}>Texto base</Text>
           <Text style={styles.value}>{reuniao.textoBase?.trim() || '—'}</Text>
         </View>
-
-        <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
       </ScrollView>
     </SafeAreaView>
   );

@@ -12,7 +12,77 @@ import {
 } from '../../lib/appwrite';
 import { uploadAvatarFromUri } from './storageAvatar';
 
-const PERMISSOES = ['membro', 'admin', 'lider'];
+const PERMISSOES = ['membro', 'admin', 'lider', 'colider'];
+
+export { PERMISSOES };
+
+/** Valor gravado em Appwrite (`permissao` como array de strings). */
+export function permissaoToAppwriteArray(value) {
+  if (Array.isArray(value)) {
+    const filtered = value.map(String).filter((p) => PERMISSOES.includes(p));
+    return filtered.length > 0 ? filtered : ['membro'];
+  }
+  const s = typeof value === 'string' ? value : 'membro';
+  return PERMISSOES.includes(s) ? [s] : ['membro'];
+}
+
+/** String única para o app (primeiro papel válido no documento). */
+export function parsePermissaoFromUsuarioDoc(doc) {
+  if (!doc) return 'membro';
+  const raw = doc.permissao;
+  if (Array.isArray(raw)) {
+    const first = raw.map(String).find((p) => PERMISSOES.includes(p));
+    return first || 'membro';
+  }
+  if (typeof raw === 'string' && PERMISSOES.includes(raw)) return raw;
+  return 'membro';
+}
+
+/**
+ * Lê `celulas` do documento Appwrite (array nativo ou string JSON legada).
+ * @param {object} [doc]
+ * @returns {string[]}
+ */
+export function parseCelulasFromUsuarioDoc(doc) {
+  if (!doc) return [];
+  const raw = doc.celulas;
+  if (Array.isArray(raw)) return raw.filter(Boolean).map(String);
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.filter(Boolean).map(String);
+    } catch (_) {
+      return [raw.trim()];
+    }
+  }
+  return [];
+}
+
+/**
+ * Acrescenta um ID de célula ao array `celulas` do documento usuário (sem duplicar).
+ */
+export async function appendCelulaIdToUsuarioAppwrite(userId, celulaId) {
+  if (!isAppwriteConfigured() || !userId || !celulaId) return;
+  const databases = getAppwriteDatabases();
+  if (!databases || !DATABASE_ID || !COLLECTION_IDS.usuarios) return;
+  try {
+    const doc = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTION_IDS.usuarios,
+      userId,
+    );
+    const existing = parseCelulasFromUsuarioDoc(doc);
+    if (existing.includes(celulaId)) return;
+    await databases.updateDocument(
+      DATABASE_ID,
+      COLLECTION_IDS.usuarios,
+      userId,
+      { celulas: [...existing, celulaId] },
+    );
+  } catch (_) {
+    /* permissões / doc inexistente / atributo ausente */
+  }
+}
 
 function applySessionFromResponse(session) {
   const client = getAppwriteClient();
@@ -112,7 +182,6 @@ export async function signUpWithAppwrite(profile) {
   } = profile;
 
   const account = getAppwriteAccount();
-  const databases = getAppwriteDatabases();
   if (!account) return null;
 
   const userId = ID.unique();
@@ -131,28 +200,84 @@ export async function signUpWithAppwrite(profile) {
     }
   }
 
-  if (databases && DATABASE_ID && COLLECTION_IDS.usuarios) {
+  await createUsuarioDocumentAppwrite(userId, {
+    nomeCompleto,
+    email,
+    dataNascimento,
+    endereco,
+    fotoPerfil: fotoPerfilId,
+    permissao: ['membro'],
+    celulas: [],
+  });
+
+  return getCurrentUserFromAppwrite();
+}
+
+/**
+ * Cria o documento `usuarios` para um Auth userId (cadastro próprio ou membro convidado).
+ */
+export async function createUsuarioDocumentAppwrite(userId, fields) {
+  if (!isAppwriteConfigured() || !userId) return;
+  const databases = getAppwriteDatabases();
+  if (!databases || !DATABASE_ID || !COLLECTION_IDS.usuarios) return;
+  const {
+    nomeCompleto,
+    email,
+    dataNascimento,
+    endereco,
+    fotoPerfil = '',
+    permissao = 'membro',
+    celulas = [],
+  } = fields;
+  const baseDoc = {
+    userId,
+    nomeCompleto: nomeCompleto || '',
+    email: (email || '').trim(),
+    dataNascimento: dataNascimento || '',
+    endereco: endereco || '',
+    fotoPerfil: fotoPerfil || '',
+    permissao: permissaoToAppwriteArray(permissao),
+  };
+  try {
+    await databases.createDocument(
+      DATABASE_ID,
+      COLLECTION_IDS.usuarios,
+      userId,
+      { ...baseDoc, celulas },
+    );
+  } catch (firstErr) {
     try {
       await databases.createDocument(
         DATABASE_ID,
         COLLECTION_IDS.usuarios,
         userId,
-        {
-          userId,
-          nomeCompleto: nomeCompleto || '',
-          email,
-          dataNascimento: dataNascimento || '',
-          endereco: endereco || '',
-          fotoPerfil: fotoPerfilId,
-          permissao: 'membro',
-        },
+        baseDoc,
       );
-    } catch (e) {
-      throw e;
+    } catch {
+      throw firstErr;
     }
   }
+}
 
-  return getCurrentUserFromAppwrite();
+/**
+ * Atualiza apenas `permissao` no documento usuarios (ex.: líder / co-líder da célula).
+ * Requer regras no Appwrite que permitam a escrita no documento alvo.
+ */
+export async function updateUsuarioPermissaoAppwrite(userId, permissao) {
+  if (!isAppwriteConfigured() || !userId) return;
+  if (!PERMISSOES.includes(permissao)) return;
+  const databases = getAppwriteDatabases();
+  if (!databases || !DATABASE_ID || !COLLECTION_IDS.usuarios) return;
+  try {
+    await databases.updateDocument(
+      DATABASE_ID,
+      COLLECTION_IDS.usuarios,
+      userId,
+      { permissao: permissaoToAppwriteArray(permissao) },
+    );
+  } catch (_) {
+    /* permissões do console ou doc inexistente */
+  }
 }
 
 /**
@@ -242,17 +367,31 @@ export async function updateProfileInAppwrite(payload, currentUser) {
         userId,
         docPayload,
       );
-    } catch (err) {
-      await databases.createDocument(
-        DATABASE_ID,
-        COLLECTION_IDS.usuarios,
-        userId,
-        {
+    } catch (_) {
+      try {
+        await databases.createDocument(
+          DATABASE_ID,
+          COLLECTION_IDS.usuarios,
           userId,
-          ...docPayload,
-          permissao: 'membro',
-        },
-      );
+          {
+            userId,
+            ...docPayload,
+            permissao: ['membro'],
+            celulas: [],
+          },
+        );
+      } catch {
+        await databases.createDocument(
+          DATABASE_ID,
+          COLLECTION_IDS.usuarios,
+          userId,
+          {
+            userId,
+            ...docPayload,
+            permissao: ['membro'],
+          },
+        );
+      }
     }
   }
 
@@ -294,6 +433,7 @@ export async function getCurrentUserFromAppwrite() {
     let fotoPerfil = '';
     let fotoPerfilUrl = null;
     let permissao = 'membro';
+    let celulas = [];
 
     if (databases && DATABASE_ID && COLLECTION_IDS.usuarios) {
       try {
@@ -309,9 +449,8 @@ export async function getCurrentUserFromAppwrite() {
           fotoPerfil = doc.fotoPerfil;
           fotoPerfilUrl = getAvatarViewUrl(doc.fotoPerfil);
         }
-        if (doc?.permissao && PERMISSOES.includes(doc.permissao)) {
-          permissao = doc.permissao;
-        }
+        celulas = parseCelulasFromUsuarioDoc(doc);
+        permissao = parsePermissaoFromUsuarioDoc(doc);
       } catch (_) {
         /* sem documento de perfil */
       }
@@ -326,6 +465,7 @@ export async function getCurrentUserFromAppwrite() {
       fotoPerfil,
       fotoPerfilUrl,
       permissao,
+      celulas,
     };
   } catch {
     return null;

@@ -41,6 +41,29 @@ export const styles = StyleSheet.create({
     lineHeight: 16,
     paddingHorizontal: 8,
   },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.95)',
+    marginBottom: 4,
+    marginTop: 4,
+  },
+  fieldHint: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.78)',
+    marginBottom: 10,
+    lineHeight: 16,
+  },
+  cepLoading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    marginTop: -4,
+  },
+  cepLoadingText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.88)',
+  },
   title: {
     fontSize: 17,
     fontWeight: '800',
@@ -80,16 +103,6 @@ export const styles = StyleSheet.create({
   btnWrap: {
     marginTop: 12,
     width: '100%',
-  },
-  footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    textAlign: 'center',
-    marginTop: 24,
-    paddingHorizontal: 16,
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: 440,
   },
   logoSpacer: {
     marginBottom: 12,

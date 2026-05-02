@@ -1,0 +1,266 @@
+import { StyleSheet } from 'react-native';
+
+export const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  sheetWrap: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  dim: {
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
+    maxHeight: '92%',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1e293b',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  scroll: {
+    maxHeight: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 16,
+  },
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#64748b',
+    marginBottom: 8,
+    marginTop: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  fieldHint: {
+    fontSize: 12,
+    color: '#64748b',
+    lineHeight: 17,
+    marginBottom: 12,
+  },
+  imagemPreviewWrap: {
+    height: 140,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#f1f5f9',
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  imagemPreview: {
+    width: '100%',
+    height: '100%',
+  },
+  imagemPlaceholder: {
+    fontSize: 14,
+    color: '#94a3b8',
+    textAlign: 'center',
+    paddingHorizontal: 24,
+  },
+  imagemActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 12,
+    justifyContent: 'center',
+  },
+  imagemBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: '#f1f5f9',
+    marginBottom: 8,
+  },
+  imagemBtnSpacer: {
+    marginLeft: 10,
+  },
+  imagemBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#334155',
+  },
+  imagemBtnDanger: {
+    backgroundColor: '#fef2f2',
+  },
+  imagemBtnDangerText: {
+    color: '#b91c1c',
+  },
+  rowActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  btnGhost: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 10,
+    backgroundColor: '#f1f5f9',
+    alignItems: 'center',
+  },
+  btnGhostText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#475569',
+  },
+  errorRoot: {
+    color: '#b91c1c',
+    fontSize: 13,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  btnWrap: {
+    marginTop: 8,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#475569',
+    marginBottom: 6,
+    marginTop: 10,
+  },
+  pickerField: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    minHeight: 48,
+    justifyContent: 'center',
+  },
+  pickerFieldError: {
+    borderColor: '#c53030',
+  },
+  pickerFieldText: {
+    fontSize: 16,
+    color: '#1e293b',
+  },
+  pickerPlaceholder: {
+    fontSize: 16,
+    color: '#999',
+  },
+  fieldError: {
+    fontSize: 12,
+    color: '#c53030',
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  textArea: {
+    minHeight: 88,
+    paddingTop: 12,
+    textAlignVertical: 'top',
+  },
+  diaOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  diaBackdropPress: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  diaSheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
+    maxHeight: '78%',
+    width: '100%',
+  },
+  diaSheetTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#1e293b',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  diaList: {
+    maxHeight: 360,
+  },
+  diaOption: {
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#e2e8f0',
+  },
+  diaOptionText: {
+    fontSize: 16,
+    color: '#1e293b',
+    fontWeight: '600',
+  },
+  diaCancel: {
+    marginTop: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  diaCancelText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64748b',
+  },
+  timeIosOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  timeIosCard: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    width: '100%',
+    maxWidth: 360,
+    alignItems: 'stretch',
+  },
+  timeIosTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#1e293b',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  timeIosPicker: {
+    alignSelf: 'stretch',
+    height: 178,
+  },
+  timeIosActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 8,
+    paddingHorizontal: 8,
+  },
+  timeIosBtnGhost: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  timeIosBtnGhostText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#64748b',
+  },
+  timeIosBtnOk: {
+    marginLeft: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#2563eb',
+    borderRadius: 10,
+  },
+  timeIosBtnOkText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+});

@@ -46,6 +46,7 @@ export function AuthProvider({ children }) {
         nomeCompleto: 'Usuário',
         email,
         permissao: 'membro',
+        celulas: [],
       });
       return { success: true };
     } catch (error) {
@@ -81,6 +82,7 @@ export function AuthProvider({ children }) {
         endereco: profile.endereco,
         fotoPerfilUrl: profile.fotoUri || null,
         permissao: 'membro',
+        celulas: [],
       });
       return { success: true };
     } catch (error) {

@@ -83,6 +83,7 @@ export default function Login() {
                   onChangeText={onChange}
                   onBlur={onBlur}
                   error={errors.senha?.message}
+                  passwordToggle
                   secureTextEntry
                   autoComplete="password"
                   textContentType="password"
@@ -112,8 +113,6 @@ export default function Login() {
               <Text style={styles.linkBold}>CADASTRE-SE</Text>
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

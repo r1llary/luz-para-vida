@@ -16,6 +16,8 @@ export function useRelatorioScreen() {
   const navigation = useNavigation();
   const { params } = useRoute();
   const celula = params?.celula;
+  const periodoInicio = params?.periodoInicio;
+  const periodoFim = params?.periodoFim;
   const { getReunioesByCelula, fetchReunioesForCelula } = useCelulas();
 
   const initialPeriod = useMemo(() => {
@@ -31,6 +33,12 @@ export function useRelatorioScreen() {
   const ano = useWatch({ control, name: 'ano' });
   const mes = useWatch({ control, name: 'mes' });
 
+  const usaPeriodoDaLista =
+    typeof periodoInicio === 'string' &&
+    typeof periodoFim === 'string' &&
+    periodoInicio.length >= 10 &&
+    periodoFim.length >= 10;
+
   useEffect(() => {
     if (celula?.id) fetchReunioesForCelula(celula.id);
   }, [celula?.id, fetchReunioesForCelula]);
@@ -38,13 +46,28 @@ export function useRelatorioScreen() {
   const todas = celula ? getReunioesByCelula(celula.id) : [];
 
   const filtradas = useMemo(() => {
-    if (!celula || ano == null || mes == null) return [];
+    if (!celula) return [];
+    if (usaPeriodoDaLista) {
+      let a = periodoInicio;
+      let b = periodoFim;
+      if (a > b) [a, b] = [b, a];
+      return todas
+        .filter((r) => {
+          const dr = r.dataReuniao || r.data;
+          if (!dr || typeof dr !== 'string') return false;
+          return dr >= a && dr <= b;
+        })
+        .sort((x, y) =>
+          String(y.dataReuniao || '').localeCompare(String(x.dataReuniao || ''))
+        );
+    }
+    if (ano == null || mes == null) return [];
     const yNum = Number(ano);
     const mNum = Number(mes);
     if (!Number.isFinite(yNum) || !Number.isFinite(mNum)) return [];
     return todas
       .filter((r) => {
-        const dr = r.dataReuniao;
+        const dr = r.dataReuniao || r.data;
         if (!dr || typeof dr !== 'string') return false;
         const parts = dr.split('-');
         const y = parseInt(parts[0], 10);
@@ -54,7 +77,15 @@ export function useRelatorioScreen() {
       .sort((a, b) =>
         String(b.dataReuniao || '').localeCompare(String(a.dataReuniao || ''))
       );
-  }, [todas, ano, mes, celula]);
+  }, [
+    todas,
+    ano,
+    mes,
+    celula,
+    usaPeriodoDaLista,
+    periodoInicio,
+    periodoFim,
+  ]);
 
   const totais = useMemo(
     () => ({
@@ -97,5 +128,8 @@ export function useRelatorioScreen() {
     formatDateBr,
     openReuniao,
     initialPeriod,
+    usaPeriodoDaLista,
+    periodoInicio,
+    periodoFim,
   };
 }

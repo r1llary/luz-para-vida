@@ -238,8 +238,6 @@ export default function EditarPerfil() {
               />
             </View>
           </View>
-
-          <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

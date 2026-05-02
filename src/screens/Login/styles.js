@@ -62,14 +62,4 @@ export const styles = StyleSheet.create({
     color: '#fff',
     letterSpacing: 0.5,
   },
-  footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    textAlign: 'center',
-    marginTop: 28,
-    paddingHorizontal: 16,
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: 400,
-  },
 });

@@ -9,7 +9,11 @@ const Stack = createNativeStackNavigator();
 export function RelatoriosStack() {
   return (
     <Stack.Navigator screenOptions={GOLD_HEADER}>
-      <Stack.Screen name="RelatoriosLista" component={RelatoriosLista} options={{ title: 'Relatórios' }} />
+      <Stack.Screen
+        name="RelatoriosLista"
+        component={RelatoriosLista}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="Relatorio" component={Relatorio} options={{ title: 'Relatório mensal' }} />
     </Stack.Navigator>
   );

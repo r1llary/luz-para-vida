@@ -2,8 +2,14 @@ import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { registroMembroSchema } from '../../schemas';
+import { registroMembroUsuarioSchema } from '../../schemas';
 import { useCelulas } from '../../contexts/CelulasContext';
+import { maskCEP, maskDateDMY, onlyDigits, parseDMYToISO } from '../../utils/brFormat';
+import {
+  fetchEnderecoByCep,
+  formatEnderecoFromCep,
+} from '../../services/viacep';
+import { buildEnderecoString } from '../../utils/buildEndereco';
 
 export function useRegistroMembroScreen() {
   const navigation = useNavigation();
@@ -11,34 +17,99 @@ export function useRegistroMembroScreen() {
   const celulaId = params?.celulaId;
   const { addMembro } = useCelulas();
   const [submitting, setSubmitting] = useState(false);
+  const [cepLookupLoading, setCepLookupLoading] = useState(false);
 
   const {
     control,
     handleSubmit,
     setError,
+    setValue,
+    getValues,
+    clearErrors,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(registroMembroSchema),
+    resolver: zodResolver(registroMembroUsuarioSchema),
     defaultValues: {
       nomeCompleto: '',
-      email: '',
-      telefone: '',
-      rua: '',
+      dataNascimento: '',
+      cep: '',
+      enderecoBase: '',
       numero: '',
       complemento: '',
-      bairro: '',
-      cidade: '',
-      cep: '',
-      data: '',
+      email: '',
     },
   });
+
+  const onCepChangeText = useCallback(
+    (text, fieldOnChange) => {
+      fieldOnChange(maskCEP(text));
+      if (onlyDigits(text).length < 8) {
+        setValue('enderecoBase', '');
+        clearErrors('enderecoBase');
+      }
+    },
+    [clearErrors, setValue]
+  );
+
+  const onCepFilled = useCallback(async () => {
+    const raw = getValues('cep');
+    const cep = onlyDigits(raw);
+    if (cep.length !== 8) return;
+    clearErrors('cep');
+    setCepLookupLoading(true);
+    try {
+      const found = await fetchEnderecoByCep(cep);
+      if (!found) {
+        setValue('enderecoBase', '', { shouldValidate: true });
+        setError('cep', {
+          message: 'CEP não encontrado. Verifique os dígitos.',
+        });
+        return;
+      }
+      const linha = formatEnderecoFromCep(found);
+      setValue('enderecoBase', linha, { shouldValidate: true });
+    } catch {
+      setError('cep', { message: 'Não foi possível consultar o CEP.' });
+    } finally {
+      setCepLookupLoading(false);
+    }
+  }, [clearErrors, getValues, setError, setValue]);
 
   const onSubmit = useCallback(
     async (data) => {
       if (!celulaId) return;
+      const iso = parseDMYToISO(data.dataNascimento);
+      if (!iso) {
+        setError('dataNascimento', {
+          message: 'Data inválida. Use DD/MM/AAAA.',
+        });
+        return;
+      }
+
       setSubmitting(true);
       try {
-        const payload = { ...data, cpfRg: '' };
+        const cepDigits = onlyDigits(data.cep);
+        const endereco = buildEnderecoString({
+          enderecoBase: data.enderecoBase,
+          numero: data.numero,
+          complemento: data.complemento,
+          cep: cepDigits,
+        });
+        const payload = {
+          nomeCompleto: data.nomeCompleto.trim(),
+          cpfRg: (data.cpfRg || '').trim(),
+          email: data.email.trim(),
+          telefone: (data.telefone || '').trim(),
+          rua: (data.enderecoBase || '').trim(),
+          numero: (data.numero || '').trim(),
+          complemento: (data.complemento || '').trim(),
+          bairro: '',
+          cidade: '',
+          cep: cepDigits,
+          dataNascimento: iso,
+          endereco,
+        };
+
         await addMembro(payload, celulaId);
         navigation.goBack();
       } catch (e) {
@@ -49,7 +120,7 @@ export function useRegistroMembroScreen() {
         setSubmitting(false);
       }
     },
-    [addMembro, celulaId, navigation, setError],
+    [addMembro, celulaId, navigation, setError]
   );
 
   return {
@@ -59,5 +130,9 @@ export function useRegistroMembroScreen() {
     errors,
     onSubmit,
     submitting,
+    maskDateDMY,
+    onCepChangeText,
+    onCepFilled,
+    cepLookupLoading,
   };
 }

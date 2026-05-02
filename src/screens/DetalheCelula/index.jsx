@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Image,
+  Modal,
+  Pressable,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { Button } from '../../components/Buttons';
+import { Ionicons } from '@expo/vector-icons';
 import { styles } from './styles';
 import { useDetalheCelulaScreen } from './useDetalheCelulaScreen';
 
@@ -59,16 +62,54 @@ export default function DetalheCelula() {
     celula,
     membros,
     reunioes,
+    user,
     formatDateBr,
-    openRelatorio,
     openNovaReuniao,
     openDetalheReuniao,
     openRegistroMembro,
+    openEditarCelula,
     openMenu,
+    opcoesLideranca,
+    canEditLideranca,
+    canEditCelula,
+    updateCelulaFields,
   } = useDetalheCelulaScreen();
 
   const insets = useSafeAreaInsets();
   const bottomPad = Math.max(insets.bottom, 10);
+
+  const [liderModalOpen, setLiderModalOpen] = useState(false);
+  const [draftLider, setDraftLider] = useState('');
+  const [draftCo, setDraftCo] = useState('');
+
+  useEffect(() => {
+    if (!liderModalOpen || !celula) return;
+    setDraftLider(celula.liderUserId || user?.id || '');
+    setDraftCo(celula.coLiderUserId || '');
+  }, [liderModalOpen, celula, user?.id]);
+
+  const opcoesCoLider = opcoesLideranca.filter((o) => o.id !== draftLider);
+
+  const onSaveLideranca = useCallback(async () => {
+    if (!celula?.id) return;
+    if (draftCo && draftCo === draftLider) {
+      Alert.alert('Validação', 'Co-líder deve ser outra pessoa além do líder.');
+      return;
+    }
+    if (!draftLider) {
+      Alert.alert('Validação', 'Selecione o líder da célula.');
+      return;
+    }
+    try {
+      await updateCelulaFields(celula.id, {
+        liderUserId: draftLider,
+        coLiderUserId: draftCo || '',
+      });
+      setLiderModalOpen(false);
+    } catch (e) {
+      Alert.alert('Erro', e?.message || 'Não foi possível salvar.');
+    }
+  }, [celula?.id, draftLider, draftCo, updateCelulaFields]);
 
   if (!celula) {
     return (
@@ -96,7 +137,10 @@ export default function DetalheCelula() {
 
       <ScrollView
         style={styles.scrollFlex}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[
+          styles.scroll,
+          !canEditCelula && styles.scrollNoFab,
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -112,33 +156,83 @@ export default function DetalheCelula() {
           )}
         </View>
 
-        <View style={styles.infoRow}>
-          <Text style={styles.infoNome} numberOfLines={2}>
+        <View style={styles.detailBlock}>
+          <Text style={styles.pageTitle} numberOfLines={4}>
             {celula.nomeCelula}
           </Text>
-          <Text style={styles.infoMeta} numberOfLines={2}>
-            {metaLinha}
-          </Text>
+          {celula.local ? (
+            <Text style={styles.localLine}>Local: {celula.local}</Text>
+          ) : null}
+          {celula.endereco ? (
+            <Text style={styles.enderecoLine}>
+              Endereço: {celula.endereco}
+            </Text>
+          ) : null}
+          {metaLinha ? (
+            <Text style={styles.metaLine} numberOfLines={2}>
+              {metaLinha}
+            </Text>
+          ) : null}
         </View>
 
-        {celula.local ? (
-          <Text style={styles.local}>Local: {celula.local}</Text>
-        ) : null}
-
-        <Text style={styles.sectionTitle}>Membros</Text>
+        <View style={[styles.sectionHeaderRow, styles.sectionHeaderRowFirst]}>
+          <Text style={styles.sectionTitleInline}>Membros</Text>
+          <View style={styles.sectionHeaderLinks}>
+            {canEditLideranca ? (
+              <TouchableOpacity
+                onPress={() => setLiderModalOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Alterar líder e co-líder"
+              >
+                <Text style={styles.sectionLink}>Alterar liderança</Text>
+              </TouchableOpacity>
+            ) : null}
+            <TouchableOpacity
+              onPress={openRegistroMembro}
+              accessibilityRole="button"
+              accessibilityLabel="Adicionar membro"
+            >
+              <Text style={styles.sectionLink}>Adicionar membro</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <View style={styles.divider} />
 
         {membros.length === 0 ? (
           <Text style={styles.empty}>Nenhum membro cadastrado.</Text>
         ) : (
-          membros.map((m) => (
-            <View key={m.id} style={styles.membroRow}>
-              <Text style={styles.membroNome}>{m.nomeCompleto}</Text>
-              {m.email ? (
-                <Text style={styles.membroEmail}>{m.email}</Text>
-              ) : null}
-            </View>
-          ))
+          membros.map((m) => {
+            const isLider =
+              Boolean(m.userId && celula.liderUserId) &&
+              m.userId === celula.liderUserId;
+            const isCo =
+              Boolean(m.userId && celula.coLiderUserId) &&
+              m.userId === celula.coLiderUserId;
+            return (
+              <View key={m.id} style={styles.membroRow}>
+                <View style={styles.membroRowTop}>
+                  <Text style={styles.membroNome} numberOfLines={2}>
+                    {m.nomeCompleto}
+                  </Text>
+                  <View style={styles.badgeRow}>
+                    {isLider ? (
+                      <View style={styles.badgeLider}>
+                        <Text style={styles.badgeText}>L</Text>
+                      </View>
+                    ) : null}
+                    {isCo ? (
+                      <View style={styles.badgeCo}>
+                        <Text style={styles.badgeTextCo}>CL</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                </View>
+                {m.email ? (
+                  <Text style={styles.membroEmail}>{m.email}</Text>
+                ) : null}
+              </View>
+            );
+          })
         )}
 
         <View style={styles.sectionHeaderRow}>
@@ -172,28 +266,99 @@ export default function DetalheCelula() {
             </TouchableOpacity>
           ))
         )}
-
-        <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
       </ScrollView>
 
-      <View style={[styles.bottomBar, { paddingBottom: bottomPad }]}>
-        <View style={styles.relatorioBtnWrap}>
-          <Button
-            variant="accent"
-            title="RELATÓRIO MENSAL"
-            onPress={openRelatorio}
-          />
+      {canEditCelula ? (
+        <View style={[styles.bottomBar, { paddingBottom: bottomPad }]}>
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={openEditarCelula}
+            activeOpacity={0.9}
+            accessibilityRole="button"
+            accessibilityLabel="Editar célula"
+          >
+            <Ionicons name="create-outline" size={26} color="#fff" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={openRegistroMembro}
-          activeOpacity={0.9}
-          accessibilityRole="button"
-          accessibilityLabel="Cadastrar membro"
+      ) : null}
+
+      <Modal
+        visible={liderModalOpen}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setLiderModalOpen(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setLiderModalOpen(false)}
         >
-          <Text style={styles.fabPlus}>+</Text>
-        </TouchableOpacity>
-      </View>
+          <Pressable
+            style={[styles.modalCard, { paddingBottom: Math.max(insets.bottom, 16) }]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <Text style={styles.modalTitle}>Líder e co-líder</Text>
+            <Text style={styles.modalHint}>
+              Escolha entre você e os membros que já têm usuário (campo userId).
+            </Text>
+
+            <View style={styles.modalSection}>
+              <Text style={styles.modalSectionLabel}>Líder</Text>
+              {opcoesLideranca.map((o) => (
+                <TouchableOpacity
+                  key={o.id}
+                  style={[
+                    styles.modalOption,
+                    draftLider === o.id && styles.modalOptionOn,
+                  ]}
+                  onPress={() => setDraftLider(o.id)}
+                >
+                  <Text style={styles.modalOptionText}>{o.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.modalSection}>
+              <Text style={styles.modalSectionLabel}>Co-líder</Text>
+              <TouchableOpacity
+                style={[
+                  styles.modalOption,
+                  !draftCo && styles.modalOptionOn,
+                ]}
+                onPress={() => setDraftCo('')}
+              >
+                <Text style={styles.modalOptionText}>Nenhum</Text>
+              </TouchableOpacity>
+              {opcoesCoLider.map((o) => (
+                <TouchableOpacity
+                  key={o.id}
+                  style={[
+                    styles.modalOption,
+                    draftCo === o.id && styles.modalOptionOn,
+                  ]}
+                  onPress={() => setDraftCo(o.id)}
+                >
+                  <Text style={styles.modalOptionText}>{o.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                onPress={() => setLiderModalOpen(false)}
+                style={styles.modalBtnPad}
+              >
+                <Text style={styles.liderancaBtnText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onSaveLideranca}
+                style={styles.modalBtnPad}
+              >
+                <Text style={styles.liderancaBtnText}>Salvar</Text>
+              </TouchableOpacity>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }

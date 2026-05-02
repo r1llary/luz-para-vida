@@ -49,4 +49,32 @@ export const styles = StyleSheet.create({
     marginTop: 4,
     fontWeight: '600',
   },
+  passwordShell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    minHeight: 48,
+  },
+  passwordShellError: {
+    borderWidth: 2,
+    borderColor: '#c53030',
+  },
+  passwordInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    paddingRight: 8,
+    fontSize: 16,
+    color: '#1e293b',
+  },
+  passwordToggle: {
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+  },
+  passwordToggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#475569',
+  },
 });

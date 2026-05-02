@@ -45,3 +45,42 @@ export async function uploadAvatarFromUri(localUri, userId) {
   if (!res.ok) return null;
   return data.$id || null;
 }
+
+/**
+ * Imagem de destaque da célula — mesmo bucket das fotos de perfil.
+ */
+export async function uploadCelulaDestaqueFromUri(localUri, celulaId, userId) {
+  if (!localUri || !BUCKET_AVATARS_ID || !celulaId || !userId) return null;
+  const client = getAppwriteClient();
+  if (!client) return null;
+  const sessionSecret = client.config.session;
+  if (!sessionSecret) return null;
+
+  const fileId = ID.unique();
+  const formData = new FormData();
+  formData.append('fileId', fileId);
+  formData.append('file', {
+    uri: localUri,
+    name: `celula-${celulaId}.jpg`,
+    type: 'image/jpeg',
+  });
+  [
+    Permission.read(Role.user(userId)),
+    Permission.update(Role.user(userId)),
+    Permission.delete(Role.user(userId)),
+  ].forEach((p) => formData.append('permissions[]', p));
+
+  const base = APPWRITE_ENDPOINT_CONFIG.replace(/\/$/, '');
+  const url = `${base}/storage/buckets/${BUCKET_AVATARS_ID}/files`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-Appwrite-Project': APPWRITE_PROJECT_ID_CONFIG,
+      'X-Appwrite-Session': sessionSecret,
+    },
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) return null;
+  return data.$id || null;
+}

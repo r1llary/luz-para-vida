@@ -20,6 +20,9 @@ export default function Relatorio() {
     formatDateBr,
     openReuniao,
     initialPeriod,
+    usaPeriodoDaLista,
+    periodoInicio,
+    periodoFim,
   } = useRelatorioScreen();
 
   if (!celula) {
@@ -39,10 +42,17 @@ export default function Relatorio() {
     >
       <Text style={styles.title}>RELATÓRIO MENSAL</Text>
       <Text style={styles.subtitle}>{celula.nomeCelula}</Text>
-      <Text style={styles.hint}>
-        Escolha o mês e o ano para ver as reuniões e totais.
-      </Text>
+      {usaPeriodoDaLista ? (
+        <Text style={styles.hint}>
+          Período: {formatDateBr(periodoInicio)} — {formatDateBr(periodoFim)}
+        </Text>
+      ) : (
+        <Text style={styles.hint}>
+          Escolha o mês e o ano para ver as reuniões e totais.
+        </Text>
+      )}
 
+      {!usaPeriodoDaLista ? (
       <View style={styles.rowInputs}>
         <View style={[styles.inputHalf, styles.inputHalfLeft]}>
           <Controller
@@ -104,6 +114,7 @@ export default function Relatorio() {
           />
         </View>
       </View>
+      ) : null}
 
       <View style={styles.cardResumo}>
         <Text style={styles.resumoTitulo}>Resumo do período</Text>
@@ -120,10 +131,14 @@ export default function Relatorio() {
         </Text>
       </View>
 
-      <Text style={styles.secReunioes}>Reuniões no mês</Text>
+      <Text style={styles.secReunioes}>
+        {usaPeriodoDaLista ? 'Reuniões no período' : 'Reuniões no mês'}
+      </Text>
       {filtradas.length === 0 ? (
         <Text style={styles.empty}>
-          Nenhuma reunião neste mês.
+          {usaPeriodoDaLista
+            ? 'Nenhuma reunião neste período.'
+            : 'Nenhuma reunião neste mês.'}
         </Text>
       ) : (
         filtradas.map((r) => (
@@ -134,7 +149,7 @@ export default function Relatorio() {
             activeOpacity={0.85}
           >
             <Text style={styles.reuniaoData}>
-              {formatDateBr(r.dataReuniao)}
+              {formatDateBr(r.dataReuniao || r.data)}
             </Text>
             <Text style={styles.reuniaoTema} numberOfLines={2}>
               {r.temaMinistrado || '—'}

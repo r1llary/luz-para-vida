@@ -50,6 +50,17 @@ export const styles = StyleSheet.create({
   presencaList: {
     marginTop: 4,
   },
+  visitanteBlock: {
+    marginBottom: 10,
+  },
+  visitanteObs: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: 'rgba(255,255,255,0.72)',
+    lineHeight: 20,
+    marginTop: 4,
+    paddingLeft: 12,
+  },
   presencaItem: {
     fontSize: 15,
     fontWeight: '500',
@@ -61,11 +72,5 @@ export const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.65)',
     textAlign: 'center',
     marginTop: 40,
-  },
-  footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.65)',
-    textAlign: 'center',
-    marginTop: 28,
   },
 });

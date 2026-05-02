@@ -9,10 +9,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { Controller } from 'react-hook-form';
-import { Input } from '../../components/Inputs';
-import { Button } from '../../components/Buttons';
 import { AuthLogo } from '../../components/AuthLogo';
+import { UsuarioCadastroFields } from '../../components/UsuarioCadastroFields';
+import { Button } from '../../components/Buttons';
 import { styles } from './styles';
 import { useRegistroUsuarioScreen } from './useRegistroUsuarioScreen';
 
@@ -24,6 +23,10 @@ export default function RegistroUsuario() {
     onSubmit,
     loading,
     goToLogin,
+    maskDateDMY,
+    onCepChangeText,
+    onCepFilled,
+    cepLookupLoading,
   } = useRegistroUsuarioScreen();
 
   return (
@@ -49,106 +52,17 @@ export default function RegistroUsuario() {
             </Text>
 
             <Text style={styles.permissaoHint}>
-              Permissão padrão: membro. A foto de perfil pode ser adicionada depois
-              em Perfil.
+              Permissão padrão: membro. A foto de perfil pode ser adicionada
+              depois em Perfil.
             </Text>
 
-            <Controller
+            <UsuarioCadastroFields
               control={control}
-              name="nomeCompleto"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Nome completo"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.nomeCompleto?.message}
-                  autoComplete="name"
-                  textContentType="name"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="dataNascimento"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Data de nascimento (AAAA-MM-DD)"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.dataNascimento?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="endereco"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Endereço (rua, número, bairro, cidade)"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.endereco?.message}
-                  textContentType="fullStreetAddress"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Email"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.email?.message}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  textContentType="emailAddress"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="senha"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Senha"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.senha?.message}
-                  secureTextEntry
-                  autoComplete="password-new"
-                  textContentType="newPassword"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="confirmarSenha"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Confirmar senha"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.confirmarSenha?.message}
-                  secureTextEntry
-                  autoComplete="password-new"
-                  textContentType="newPassword"
-                />
-              )}
+              errors={errors}
+              maskDateDMY={maskDateDMY}
+              onCepChangeText={onCepChangeText}
+              onCepFilled={onCepFilled}
+              cepLookupLoading={cepLookupLoading}
             />
 
             {errors.root?.message ? (
@@ -173,8 +87,6 @@ export default function RegistroUsuario() {
               <Text style={styles.linkBold}>ENTRE</Text>
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

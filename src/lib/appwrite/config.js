@@ -16,13 +16,20 @@ export const DATABASE_ID = env.EXPO_PUBLIC_APPWRITE_DATABASE_ID || '';
 
 /**
  * IDs das collections (Table IDs no console).
- * Fallbacks = nomes usados em docs/APPWRITE_COLLECTIONS.md
+ * Nomes padrão alinhados a `docs/collectiosn.md` (`reuniao`, `visitante`).
+ * Variáveis legadas: RELATORIOS, VISITANTES — ainda aceitas como fallback.
  */
 export const COLLECTION_IDS = {
   usuarios: env.EXPO_PUBLIC_APPWRITE_COLLECTION_USUARIOS || 'usuarios',
   celulas: env.EXPO_PUBLIC_APPWRITE_COLLECTION_CELULAS || 'celulas',
-  membros: env.EXPO_PUBLIC_APPWRITE_COLLECTION_MEMBROS || 'membros',
-  relatorios: env.EXPO_PUBLIC_APPWRITE_COLLECTION_RELATORIOS || 'relatorios',
+  relatorios:
+    env.EXPO_PUBLIC_APPWRITE_COLLECTION_REUNIAO ||
+    env.EXPO_PUBLIC_APPWRITE_COLLECTION_RELATORIOS ||
+    'reuniao',
+  visitantes:
+    env.EXPO_PUBLIC_APPWRITE_COLLECTION_VISITANTE ||
+    env.EXPO_PUBLIC_APPWRITE_COLLECTION_VISITANTES ||
+    'visitante',
 };
 
 /** Bucket Storage para fotos de perfil (criar no Console → Storage) */
@@ -37,9 +44,9 @@ export function isAppwriteConfigured() {
   return Boolean(APPWRITE_PROJECT_ID && APPWRITE_PROJECT_ID.trim() !== '');
 }
 
-/** True quando database + collections estão definidos (persistência nos formulários). */
+/** True quando database + collections mínimas (`celulas`, reuniões) estão definidos. */
 export function isAppwriteDatabaseConfigured() {
   if (!isAppwriteConfigured() || !DATABASE_ID.trim()) return false;
-  const { celulas, membros, relatorios } = COLLECTION_IDS;
-  return Boolean(celulas && membros && relatorios);
+  const { celulas, relatorios } = COLLECTION_IDS;
+  return Boolean(celulas && relatorios);
 }

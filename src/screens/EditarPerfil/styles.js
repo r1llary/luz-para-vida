@@ -153,14 +153,4 @@ export const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 8,
   },
-  footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    textAlign: 'center',
-    marginTop: 20,
-    paddingHorizontal: 16,
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: 440,
-  },
 });

@@ -6,13 +6,14 @@ import {
   FlatList,
   ScrollView,
   Image,
-  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { styles } from './styles';
 import { useMinhasCelulasScreen } from './useMinhasCelulasScreen';
+import { NovaCelulaModal } from '../../components/NovaCelulaModal';
+import { openMapsAddress } from '../../utils/openMapsAddress';
 
 const LOGO_HEADER = require('../../../assets/logo.png');
 
@@ -58,60 +59,71 @@ function ImagePlaceholder() {
 export default function MinhasCelulas() {
   const {
     celulas,
-    usandoMockLista,
     handleCadastrar,
     openDrawer,
     openDetalheCelula,
+    novaCelulaOpen,
+    closeNovaCelula,
+    onNovaCelulaCreated,
   } = useMinhasCelulasScreen();
 
-  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-
-  const PAD = 16;
-  const GAP = 12;
-  const cardWidth = (width - PAD * 2 - GAP) / 2;
-
   const fabBottom = 20 + Math.max(insets.bottom, 8);
 
   const renderCelula = useCallback(
-    ({ item }) => (
-      <TouchableOpacity
-        style={[styles.card, { width: cardWidth }]}
-        onPress={() => openDetalheCelula(item)}
-        activeOpacity={0.9}
-      >
-        <View style={styles.cardImageWrap}>
-          {item.imagemUrl ? (
-            <Image
-              source={{ uri: item.imagemUrl }}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <ImagePlaceholder />
-          )}
+    ({ item }) => {
+      const meta = [item.dia, item.horario].filter(Boolean).join(' · ');
+      return (
+        <View style={styles.card}>
+          <TouchableOpacity
+            onPress={() => openDetalheCelula(item)}
+            activeOpacity={0.92}
+            accessibilityRole="button"
+            accessibilityLabel={`Abrir ${item.nomeCelula || 'célula'}`}
+          >
+            <View style={styles.cardImageWrap}>
+              {item.imagemUrl ? (
+                <Image
+                  source={{ uri: item.imagemUrl }}
+                  style={styles.cardImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <ImagePlaceholder />
+              )}
+            </View>
+            <View style={styles.cardBody}>
+              <Text style={styles.cardNome} numberOfLines={2}>
+                {item.nomeCelula || '—'}
+              </Text>
+              {item.local ? (
+                <Text style={styles.cardLocal} numberOfLines={2}>
+                  {item.local}
+                </Text>
+              ) : null}
+              <Text style={styles.cardEndereco} numberOfLines={4}>
+                {item.endereco?.trim() ? item.endereco : 'Endereço não informado'}
+              </Text>
+              {meta ? (
+                <Text style={styles.cardMeta} numberOfLines={2}>
+                  {meta}
+                </Text>
+              ) : null}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.mapsBtn}
+            onPress={() => openMapsAddress(item.endereco)}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Como chegar no mapa"
+          >
+            <Text style={styles.mapsBtnText}>Como chegar</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.cardBody}>
-          <Text style={styles.cardNome} numberOfLines={2}>
-            {item.nomeCelula}
-          </Text>
-          <Text style={styles.cardDia} numberOfLines={2}>
-            {item.dia}
-          </Text>
-          <Text style={styles.cardHorario} numberOfLines={1}>
-            {item.horario}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    ),
-    [cardWidth, openDetalheCelula],
-  );
-
-  const ListFooter = useCallback(
-    () => (
-      <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
-    ),
-    [],
+      );
+    },
+    [openDetalheCelula],
   );
 
   const renderFab = () => (
@@ -141,9 +153,13 @@ export default function MinhasCelulas() {
           <Text style={styles.emptyText}>
             Use o botão + para registrar sua primeira célula.
           </Text>
-          <ListFooter />
         </ScrollView>
         {renderFab()}
+        <NovaCelulaModal
+          visible={novaCelulaOpen}
+          onClose={closeNovaCelula}
+          onCreated={onNovaCelulaCreated}
+        />
       </SafeAreaView>
     );
   }
@@ -152,24 +168,21 @@ export default function MinhasCelulas() {
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <StatusBar style="light" />
       <ScreenHeader onOpenMenu={openDrawer} />
-      {__DEV__ && usandoMockLista ? (
-        <Text style={[styles.mockHint, { paddingHorizontal: 16, paddingBottom: 6 }]}>
-          Lista de teste — mockFlags.js (USE_CELULAS_LIST_MOCK)
-        </Text>
-      ) : null}
       <FlatList
         style={styles.listFlex}
         data={celulas}
         keyExtractor={(item) => item.id}
         renderItem={renderCelula}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrap}
-        ListFooterComponent={ListFooter}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       />
       {renderFab()}
+      <NovaCelulaModal
+        visible={novaCelulaOpen}
+        onClose={closeNovaCelula}
+        onCreated={onNovaCelulaCreated}
+      />
     </SafeAreaView>
   );
 }

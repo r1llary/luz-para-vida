@@ -72,8 +72,13 @@ export function CustomDrawerContent({ navigation }) {
         onPress={() => navToTab('CelulasTab', { screen: 'MinhasCelulas' })}
       />
       <DrawerLink
-        label="RegistroCelula — Nova célula"
-        onPress={() => navToTab('CelulasTab', { screen: 'RegistroCelula' })}
+        label="Nova célula (modal)"
+        onPress={() =>
+          navToTab('CelulasTab', {
+            screen: 'MinhasCelulas',
+            params: { openNovaCelula: true },
+          })
+        }
       />
       <DrawerLink
         label="DetalheCelula — abrir uma célula na lista"
