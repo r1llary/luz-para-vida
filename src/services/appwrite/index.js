@@ -9,6 +9,7 @@ export {
 } from './authService';
 
 export {
+  listAllCelulasAppwrite,
   listCelulasAppwrite,
   createCelulaAppwrite,
   listMembrosByCelulaAppwrite,

@@ -8,7 +8,7 @@ import { CELULAS_MOCK } from '../../mocks/celulasMock';
 
 export function useMinhasCelulasScreen() {
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, canManage } = useAuth();
   const { celulas } = useCelulas();
 
   const celulasExibidas = useMemo(
@@ -33,6 +33,7 @@ export function useMinhasCelulasScreen() {
 
   return {
     user,
+    canManage,
     celulas: celulasExibidas,
     usandoMockLista: USE_CELULAS_LIST_MOCK,
     handleCadastrar,

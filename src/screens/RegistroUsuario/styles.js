@@ -33,13 +33,49 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     paddingHorizontal: 8,
   },
-  permissaoHint: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.72)',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 16,
+  roleSectionLabel: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.9)',
+    fontWeight: '700',
+    marginBottom: 8,
+    paddingHorizontal: 2,
+    letterSpacing: 0.3,
+  },
+  roleRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+  },
+  roleBtn: {
+    flex: 1,
+    paddingVertical: 12,
     paddingHorizontal: 8,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
+  roleBtnActive: {
+    borderColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.28)',
+  },
+  roleBtnLabel: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.6)',
+    letterSpacing: 0.2,
+  },
+  roleBtnLabelActive: {
+    color: '#fff',
+  },
+  roleBtnDesc: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 2,
+  },
+  roleBtnDescActive: {
+    color: 'rgba(255,255,255,0.85)',
   },
   title: {
     fontSize: 17,

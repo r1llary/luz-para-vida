@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,14 +35,8 @@ export function CustomDrawerContent({ navigation }) {
   };
 
   const confirmSignOut = () => {
-    Alert.alert('Sair', 'Deseja sair da sua conta?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: () => void signOut(),
-      },
-    ]);
+    navigation.closeDrawer();
+    void signOut();
   };
 
   return (
@@ -114,7 +107,7 @@ export function CustomDrawerContent({ navigation }) {
       <Text style={styles.section}>Conta</Text>
       <TouchableOpacity
         style={styles.linkDanger}
-        onPress={() => closeAnd(confirmSignOut)}
+        onPress={confirmSignOut}
       >
         <Text style={styles.linkDangerText}>Sair</Text>
       </TouchableOpacity>

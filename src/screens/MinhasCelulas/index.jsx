@@ -58,6 +58,7 @@ function ImagePlaceholder() {
 export default function MinhasCelulas() {
   const {
     celulas,
+    canManage,
     usandoMockLista,
     handleCadastrar,
     openDrawer,
@@ -138,12 +139,19 @@ export default function MinhasCelulas() {
           showsVerticalScrollIndicator={false}
         >
           <Text style={styles.emptyTitle}>Nenhuma célula cadastrada</Text>
-          <Text style={styles.emptyText}>
-            Use o botão + para registrar sua primeira célula.
-          </Text>
+          {canManage ? (
+            <Text style={styles.emptyText}>
+              Use o botão + para registrar sua primeira célula.
+            </Text>
+          ) : (
+            <Text style={styles.emptyText}>
+              Você ainda não está vinculado a nenhuma célula. Entre em contato
+              com um líder para ser adicionado.
+            </Text>
+          )}
           <ListFooter />
         </ScrollView>
-        {renderFab()}
+        {canManage ? renderFab() : null}
       </SafeAreaView>
     );
   }
@@ -169,7 +177,7 @@ export default function MinhasCelulas() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       />
-      {renderFab()}
+      {canManage ? renderFab() : null}
     </SafeAreaView>
   );
 }

@@ -80,7 +80,7 @@ export function AuthProvider({ children }) {
         dataNascimento: profile.dataNascimento,
         endereco: profile.endereco,
         fotoPerfilUrl: profile.fotoUri || null,
-        permissao: 'membro',
+        permissao: profile.permissao || 'membro',
       });
       return { success: true };
     } catch (error) {
@@ -141,11 +141,20 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
+  const isAdmin = user?.permissao === 'admin';
+  const isLider = user?.permissao === 'lider';
+  const isMembro = !!user && user?.permissao === 'membro';
+  const canManage = isLider || isAdmin;
+
   const value = {
     user,
     loading,
     initialCheck,
     isAuthenticated: !!user,
+    isAdmin,
+    isLider,
+    isMembro,
+    canManage,
     signIn,
     signUp,
     updateProfile,

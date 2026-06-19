@@ -109,6 +109,7 @@ export async function signUpWithAppwrite(profile) {
     dataNascimento,
     endereco,
     fotoUri,
+    permissao,
   } = profile;
 
   const account = getAppwriteAccount();
@@ -144,7 +145,7 @@ export async function signUpWithAppwrite(profile) {
           dataNascimento: dataNascimento || '',
           endereco: endereco || '',
           fotoPerfil: fotoPerfilId,
-          permissao: 'membro',
+          permissao: PERMISSOES.includes(permissao) ? permissao : 'membro',
         },
       );
     } catch (e) {

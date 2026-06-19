@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useAuth } from './AuthContext';
 import { isAppwriteDatabaseConfigured } from '../lib/appwrite';
 import {
+  listAllCelulasAppwrite,
   listCelulasAppwrite,
   createCelulaAppwrite,
   listMembrosByCelulaAppwrite,
@@ -13,7 +14,7 @@ import {
 const CelulasContext = createContext(null);
 
 export function CelulasProvider({ children }) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [celulas, setCelulas] = useState([]);
   const [membros, setMembros] = useState([]);
   const [reunioes, setReunioes] = useState([]);
@@ -28,11 +29,14 @@ export function CelulasProvider({ children }) {
     }
     if (!isAppwriteDatabaseConfigured()) return;
     setLoadingCelulas(true);
-    listCelulasAppwrite(user.id)
+    const fetch = isAdmin
+      ? listAllCelulasAppwrite()
+      : listCelulasAppwrite(user.id);
+    fetch
       .then(setCelulas)
       .catch(() => setCelulas([]))
       .finally(() => setLoadingCelulas(false));
-  }, [user?.id]);
+  }, [user?.id, isAdmin]);
 
   const fetchMembrosForCelula = useCallback(async (celulaId) => {
     if (!isAppwriteDatabaseConfigured() || !celulaId) return;

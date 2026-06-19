@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { DrawerActions } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAuth } from '../../contexts/AuthContext';
 import { useCelulas } from '../../contexts/CelulasContext';
 
 export function formatDateBr(iso) {
@@ -14,6 +15,7 @@ export function useDetalheCelulaScreen() {
   const navigation = useNavigation();
   const { params } = useRoute();
   const celula = params?.celula;
+  const { canManage } = useAuth();
   const {
     getMembrosByCelula,
     fetchMembrosForCelula,
@@ -66,6 +68,7 @@ export function useDetalheCelulaScreen() {
     celula,
     membros,
     reunioes,
+    canManage,
     formatDateBr,
     openRelatorio,
     openNovaReuniao,

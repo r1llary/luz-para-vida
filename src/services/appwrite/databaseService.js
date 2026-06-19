@@ -36,6 +36,16 @@ function mapReuniaoDocument(doc) {
   };
 }
 
+export async function listAllCelulasAppwrite() {
+  if (!ensureConfig()) return [];
+  const d = db();
+  if (!d) return [];
+  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.celulas, [
+    Query.orderDesc('$createdAt'),
+  ]);
+  return (res.documents || []).map(normalizeDocument);
+}
+
 /**
  * Células do usuário logado.
  */

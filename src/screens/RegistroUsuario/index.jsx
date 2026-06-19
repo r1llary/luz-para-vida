@@ -24,6 +24,8 @@ export default function RegistroUsuario() {
     onSubmit,
     loading,
     goToLogin,
+    permissao,
+    setPermissao,
   } = useRegistroUsuarioScreen();
 
   return (
@@ -48,10 +50,39 @@ export default function RegistroUsuario() {
               Preencha seus dados para se cadastrar
             </Text>
 
-            <Text style={styles.permissaoHint}>
-              Permissão padrão: membro. A foto de perfil pode ser adicionada depois
-              em Perfil.
-            </Text>
+            <Text style={styles.roleSectionLabel}>Seu perfil no app</Text>
+            <View style={styles.roleRow}>
+              <TouchableOpacity
+                style={[styles.roleBtn, permissao === 'lider' && styles.roleBtnActive]}
+                onPress={() => setPermissao('lider')}
+                activeOpacity={0.8}
+                accessibilityRole="radio"
+                accessibilityLabel="Líder"
+                accessibilityState={{ selected: permissao === 'lider' }}
+              >
+                <Text style={[styles.roleBtnLabel, permissao === 'lider' && styles.roleBtnLabelActive]}>
+                  Líder
+                </Text>
+                <Text style={[styles.roleBtnDesc, permissao === 'lider' && styles.roleBtnDescActive]}>
+                  Gerencia células
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleBtn, permissao === 'membro' && styles.roleBtnActive]}
+                onPress={() => setPermissao('membro')}
+                activeOpacity={0.8}
+                accessibilityRole="radio"
+                accessibilityLabel="Membro"
+                accessibilityState={{ selected: permissao === 'membro' }}
+              >
+                <Text style={[styles.roleBtnLabel, permissao === 'membro' && styles.roleBtnLabelActive]}>
+                  Membro
+                </Text>
+                <Text style={[styles.roleBtnDesc, permissao === 'membro' && styles.roleBtnDescActive]}>
+                  Participa de células
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <Controller
               control={control}

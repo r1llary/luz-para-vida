@@ -1,201 +1,177 @@
-# Appwrite – Collections e tipagem
+# Appwrite – Collections e configuração
 
-Use este guia para criar no **Console Appwrite** o Database e as Collections do app Luz para Vida. Depois, preencha os IDs em `src/lib/appwrite/config.js` (ou via variáveis de ambiente).
+Guia para criar o Database e as Collections do app **Luz para Vida** no Console Appwrite.
 
 ---
 
-## 1. Variáveis / Chaves
+## 1. Variáveis de ambiente (`.env`)
 
-No projeto, configure (posteriormente) as chaves do Appwrite:
+```env
+EXPO_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+EXPO_PUBLIC_APPWRITE_PROJECT_ID=SEU_PROJECT_ID
+EXPO_PUBLIC_APPWRITE_DATABASE_ID=SEU_DATABASE_ID
+EXPO_PUBLIC_APPWRITE_COLLECTION_USUARIOS=usuarios
+EXPO_PUBLIC_APPWRITE_COLLECTION_CELULAS=celulas
+EXPO_PUBLIC_APPWRITE_COLLECTION_MEMBROS=membros
+EXPO_PUBLIC_APPWRITE_COLLECTION_RELATORIOS=relatorios
+EXPO_PUBLIC_APPWRITE_BUCKET_AVATARES=SEU_BUCKET_ID
+```
 
-| Variável | Onde definir | Descrição |
-|----------|----------------|-----------|
-| `EXPO_PUBLIC_APPWRITE_ENDPOINT` | `.env` ou `config.js` | URL do Appwrite (ex: `https://cloud.appwrite.io/v1`) |
-| `EXPO_PUBLIC_APPWRITE_PROJECT_ID` | Console → Project Settings | ID do projeto |
-| `EXPO_PUBLIC_APPWRITE_DATABASE_ID` | Após criar o Database | ID do database |
-| IDs das collections | `config.js` → `COLLECTION_IDS` | IDs de cada collection (abaixo) |
-
-Enquanto `APPWRITE_PROJECT_ID` estiver vazio, o app usa dados em memória (sem backend).
+Enquanto `EXPO_PUBLIC_APPWRITE_PROJECT_ID` estiver vazio, o app roda offline (dados em memória).
 
 ---
 
 ## 2. Database
 
-- **Nome sugerido:** `luz-para-vida` (ou `main`)
-- Crie um Database no Console e anote o **Database ID**.
-- Use esse ID em `DATABASE_ID` em `src/lib/appwrite/config.js`.
+- Crie um Database no Console → **Databases → Create Database**
+- Nome sugerido: `luz-para-vida`
+- Copie o **Database ID** e coloque em `EXPO_PUBLIC_APPWRITE_DATABASE_ID`
 
 ---
 
-## 3. Collections e atributos
+## 3. Collections
 
-Crie cada collection abaixo no Database e, em seguida, os atributos com o **tipo** e **obrigatoriedade** indicados.  
-Os nomes dos atributos devem ser **exatamente** os da tabela (case-sensitive).
-
----
-
-### 3.1 Collection: `usuarios`
-
-**Nome para exibição:** Usuários  
-**Document ID:** Use **Document ID = $uid** (igual ao userId do Auth), para um documento por usuário logado.
-
-| Atributo       | Tipo   | Tamanho | Obrigatório | Descrição                          |
-|----------------|--------|---------|-------------|------------------------------------|
-| `userId`       | string | 36      | Sim         | ID do usuário (Auth) – mesmo que $uid |
-| `nomeCompleto` | string | 255     | Sim         | Nome completo do usuário           |
-| `email`        | string | 255     | Não         | Email (espelho do Auth)            |
-
-**Permissões sugeridas:**  
-- Leitura: `users` (só o próprio usuário).  
-- Escrita: `users` (só o próprio usuário).  
-No Console, use “User” com `userId` = `request.auth.uid` para read/write.
+> Os nomes dos atributos são **case-sensitive** — use exatamente como na tabela.
 
 ---
 
-### 3.2 Collection: `celulas`
+### 3.1 `usuarios`
 
-**Nome para exibição:** Células
+Armazena o perfil de cada usuário autenticado.
+**Document ID = mesmo $uid do Auth** (um documento por usuário).
 
-| Atributo          | Tipo    | Tamanho | Obrigatório | Descrição                    |
-|-------------------|---------|---------|-------------|------------------------------|
-| `userId`          | string  | 36      | Sim         | Dono da célula (Auth user ID) |
-| `nomeCelula`      | string  | 255     | Sim         | Nome da célula               |
-| `local`           | string  | 255     | Sim         | Local                        |
-| `endereco`        | string  | 500     | Sim         | Endereço                     |
-| `dia`             | string  | 100     | Sim         | Dia (ex: Segunda-feira)      |
-| `horario`         | string  | 50      | Sim         | Horário (ex: 18h)            |
-| `celulaRaiz`      | string  | 255     | Não         | Célula raiz                  |
-| `temaMinistrado`  | string  | 500     | Não         | Tema ministrado              |
-| `textoBase`       | string  | 2000    | Não         | Texto base                   |
-| `visitantes`      | integer | –       | Não         | Nº de visitantes (default 0) |
-| `membrosPresentes`| integer | –       | Não         | Nº de membros presentes (0+) |
+| Atributo         | Tipo   | Tamanho | Obrigatório | Descrição                                    |
+|------------------|--------|---------|-------------|----------------------------------------------|
+| `userId`         | String | 36      | Sim         | ID do usuário Auth (mesmo valor do $uid)     |
+| `nomeCompleto`   | String | 255     | Sim         | Nome completo                                |
+| `email`          | String | 255     | Não         | Email (espelho do Auth)                      |
+| `dataNascimento` | String | 20      | Não         | Data de nascimento AAAA-MM-DD                |
+| `endereco`       | String | 500     | Não         | Endereço completo                            |
+| `fotoPerfil`     | String | 36      | Não         | File ID do Storage (bucket avatares)         |
+| `permissao`      | Enum   | –       | Sim         | Papel do usuário: `membro` / `lider` / `admin` |
 
-**Permissões sugeridas:**  
-- Create: `users` (autenticados).  
-- Read/Update/Delete: usuário dono (`userId` = `request.auth.uid`).
+**Campo `permissao`:** no Console, crie como tipo **String** com valores permitidos `membro`, `lider`, `admin`. Default: `membro`.
 
----
-
-### 3.3 Collection: `membros`
-
-**Nome para exibição:** Membros
-
-| Atributo       | Tipo   | Tamanho | Obrigatório | Descrição          |
-|----------------|--------|---------|-------------|--------------------|
-| `celulaId`     | string | 36      | Sim         | ID do doc. da célula |
-| `nomeCompleto` | string | 255     | Sim         | Nome do membro     |
-| `cpfRg`        | string | 20      | Sim         | CPF ou RG          |
-| `email`        | string | 255     | Não         | Email              |
-| `telefone`     | string | 30      | Não         | Telefone           |
-| `rua`          | string | 255     | Não         | Rua                |
-| `numero`       | string | 20      | Não         | Número             |
-| `complemento`  | string | 255     | Não         | Complemento        |
-| `bairro`       | string | 150     | Não         | Bairro            |
-| `cidade`       | string | 150     | Não         | Cidade            |
-| `cep`          | string | 10      | Não         | CEP               |
-| `data`         | string | 20      | Não         | Data (ex: nasc.)  |
-
-**Permissões sugeridas:**  
-- Create: usuários autenticados.  
-- Read/Update/Delete: apenas quem tem acesso à célula (ex.: dono da célula via `celulaId`).
+**Permissões da collection:**
+- Any → nenhuma
+- Users → Create, Read, Update, Delete (cada usuário acessa apenas o próprio documento)
 
 ---
 
-### 3.4 Collection: `relatorios`
+### 3.2 `celulas`
 
-**Nome para exibição:** Relatórios  
-Um documento por célula (atualizado ao salvar o relatório).
+Uma célula por documento. Cada célula pertence a um usuário (`userId`).
 
-| Atributo           | Tipo    | Tamanho | Obrigatório | Descrição              |
-|--------------------|---------|---------|-------------|------------------------|
-| `celulaId`         | string  | 36      | Sim         | ID do doc. da célula   |
-| `temaMinistrado`   | string  | 500     | Sim         | Tema ministrado        |
-| `textoBase`        | string  | 2000    | Não         | Texto base             |
-| `visitantes`       | integer | –       | Sim         | Nº visitantes (0+)     |
-| `membrosPresentes` | integer | –       | Sim         | Nº membros presentes   |
+| Atributo           | Tipo    | Tamanho | Obrigatório | Descrição                          |
+|--------------------|---------|---------|-------------|------------------------------------|
+| `userId`           | String  | 36      | Sim         | ID do dono da célula (Auth UID)    |
+| `nomeCelula`       | String  | 255     | Sim         | Nome da célula                     |
+| `local`            | String  | 255     | Não         | Local do encontro                  |
+| `endereco`         | String  | 500     | Não         | Endereço completo                  |
+| `dia`              | String  | 100     | Não         | Dia da semana (ex: Segunda-feira)  |
+| `horario`          | String  | 50      | Não         | Horário (ex: 18h)                  |
+| `celulaRaiz`       | String  | 255     | Não         | Nome/referência da célula raiz     |
+| `temaMinistrado`   | String  | 500     | Não         | Tema ministrado                    |
+| `textoBase`        | String  | 2000    | Não         | Texto / versículo base             |
+| `visitantes`       | Integer | –       | Não         | Nº de visitantes (≥ 0, default 0)  |
+| `membrosPresentes` | Integer | –       | Não         | Nº de membros presentes (≥ 0)      |
 
-**Permissões sugeridas:**  
-- Create/Update: usuário dono da célula.  
-- Read: usuário dono da célula.
+**Índice obrigatório:**
+- Crie um índice em `userId` (tipo: Key) — usado na query `Query.equal('userId', [userId])`.
+
+**Permissões da collection:**
+- Users → Create (qualquer autenticado pode criar)
+- Users → Read, Update, Delete (só o dono, controlado via `userId` no código)
 
 ---
 
-## 4. Resumo – IDs para o `config.js`
+### 3.3 `membros`
 
-Após criar no Console:
+Membros cadastrados em cada célula.
 
-1. **Database** → copie o Database ID → `DATABASE_ID` (ou `EXPO_PUBLIC_APPWRITE_DATABASE_ID`).
-2. **Collections** → copie cada Collection ID e preencha em `COLLECTION_IDS`:
+| Atributo       | Tipo   | Tamanho | Obrigatório | Descrição                         |
+|----------------|--------|---------|-------------|-----------------------------------|
+| `celulaId`     | String | 36      | Sim         | ID do documento da célula         |
+| `nomeCompleto` | String | 255     | Sim         | Nome completo do membro           |
+| `cpfRg`        | String | 20      | Não         | CPF ou RG                         |
+| `email`        | String | 255     | Não         | Email                             |
+| `telefone`     | String | 30      | Não         | Telefone / WhatsApp               |
+| `rua`          | String | 255     | Não         | Rua                               |
+| `numero`       | String | 20      | Não         | Número                            |
+| `complemento`  | String | 255     | Não         | Complemento                       |
+| `bairro`       | String | 150     | Não         | Bairro                            |
+| `cidade`       | String | 150     | Não         | Cidade                            |
+| `cep`          | String | 10      | Não         | CEP                               |
+| `data`         | String | 20      | Não         | Data de nascimento (AAAA-MM-DD)   |
 
-```js
-export const COLLECTION_IDS = {
-  usuarios: 'COLE_O_ID_DA_COLLECTION_USUARIOS',
-  celulas: 'COLE_O_ID_DA_COLLECTION_CELULAS',
-  membros: 'COLE_O_ID_DA_COLLECTION_MEMBROS',
-  relatorios: 'COLE_O_ID_DA_COLLECTION_RELATORIOS',
-};
+**Índice obrigatório:**
+- Índice em `celulaId` (tipo: Key) — usado em `Query.equal('celulaId', [celulaId])`.
+
+**Permissões da collection:**
+- Users → Create, Read, Update, Delete
+
+---
+
+### 3.4 `relatorios`
+
+Um documento por reunião de célula (não um por mês — um por encontro).
+
+| Atributo             | Tipo    | Tamanho | Obrigatório | Descrição                                          |
+|----------------------|---------|---------|-------------|----------------------------------------------------|
+| `celulaId`           | String  | 36      | Sim         | ID do documento da célula                          |
+| `dataReuniao`        | String  | 10      | Sim         | Data da reunião no formato `AAAA-MM-DD`            |
+| `temaMinistrado`     | String  | 500     | Não         | Tema ministrado na reunião                         |
+| `textoBase`          | String  | 2000    | Não         | Texto / versículo base                             |
+| `visitantes`         | Integer | –       | Não         | Nº de visitantes (≥ 0, default 0)                  |
+| `membrosPresentes`   | Integer | –       | Não         | Nº de membros presentes (calculado automaticamente)|
+| `membrosPresentesIds`| String  | 5000    | Não         | JSON com array de IDs dos membros presentes        |
+
+> **`membrosPresentesIds`** é salvo como string JSON (ex: `["id1","id2"]`). O app faz o parse automaticamente ao ler.
+
+**Índices obrigatórios:**
+- Índice em `celulaId` (tipo: Key)
+- Índice em `dataReuniao` (tipo: Key) — para ordenação por data
+
+**Permissões da collection:**
+- Users → Create, Read, Update, Delete
+
+---
+
+## 4. Storage – Bucket `avatares`
+
+Para fotos de perfil dos usuários.
+
+- Crie em **Storage → Create Bucket**
+- Nome: `avatares`
+- Copie o **Bucket ID** e coloque em `EXPO_PUBLIC_APPWRITE_BUCKET_AVATARES`
+- Permissões: Users → Create, Read, Update, Delete
+- Tamanho máximo de arquivo: 5 MB
+- Extensões permitidas: `jpg`, `jpeg`, `png`, `webp`
+
+---
+
+## 5. Resumo – IDs no `.env`
+
+Após criar tudo no Console, preencha o `.env` com os IDs reais:
+
+```env
+EXPO_PUBLIC_APPWRITE_PROJECT_ID=abc123...
+EXPO_PUBLIC_APPWRITE_DATABASE_ID=def456...
+EXPO_PUBLIC_APPWRITE_COLLECTION_USUARIOS=ghi789...
+EXPO_PUBLIC_APPWRITE_COLLECTION_CELULAS=jkl012...
+EXPO_PUBLIC_APPWRITE_COLLECTION_MEMBROS=mno345...
+EXPO_PUBLIC_APPWRITE_COLLECTION_RELATORIOS=pqr678...
+EXPO_PUBLIC_APPWRITE_BUCKET_AVATARES=stu901...
 ```
 
+Após salvar o `.env`, reinicie o Metro: `npx expo start -c`
+
 ---
 
-## 5. Tipagem (TypeScript / JSDoc)
+## 6. Ordem de criação recomendada
 
-Para referência no código (opcional):
-
-```ts
-// Usuário (Auth + documento em usuarios)
-interface User {
-  id: string;
-  email: string;
-  nomeCompleto: string;
-}
-
-// Documento da collection usuarios
-interface UsuarioDocument {
-  userId: string;
-  nomeCompleto: string;
-  email?: string;
-}
-
-// Documento da collection celulas
-interface CelulaDocument {
-  userId: string;
-  nomeCelula: string;
-  local: string;
-  endereco: string;
-  dia: string;
-  horario: string;
-  celulaRaiz?: string;
-  temaMinistrado?: string;
-  textoBase?: string;
-  visitantes?: number;
-  membrosPresentes?: number;
-}
-
-// Documento da collection membros
-interface MembroDocument {
-  celulaId: string;
-  nomeCompleto: string;
-  cpfRg: string;
-  email?: string;
-  telefone?: string;
-  rua?: string;
-  numero?: string;
-  complemento?: string;
-  bairro?: string;
-  cidade?: string;
-  cep?: string;
-  data?: string;
-}
-
-// Documento da collection relatorios
-interface RelatorioDocument {
-  celulaId: string;
-  temaMinistrado: string;
-  textoBase?: string;
-  visitantes: number;
-  membrosPresentes: number;
-}
-```
-
-Com as collections e o `config.js` preenchidos, o app passa a usar o Appwrite como backend.
+1. Criar o **Database**
+2. Criar as **4 collections** com seus atributos e índices
+3. Criar o **bucket** `avatares` no Storage
+4. Preencher o `.env` com todos os IDs
+5. Reiniciar o Metro (`npx expo start -c`)

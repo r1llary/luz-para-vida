@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export function useRegistroUsuarioScreen() {
   const navigation = useNavigation();
   const { signUp, loading } = useAuth();
+  const [permissao, setPermissao] = useState('membro');
 
   const {
     control,
@@ -22,6 +24,7 @@ export function useRegistroUsuarioScreen() {
       email: '',
       senha: '',
       confirmarSenha: '',
+      permissao: 'membro',
     },
   });
 
@@ -32,6 +35,7 @@ export function useRegistroUsuarioScreen() {
       senha: data.senha,
       dataNascimento: data.dataNascimento,
       endereco: data.endereco,
+      permissao,
     });
     if (!result.success) {
       setError('root', { message: result.error || 'Erro ao cadastrar' });
@@ -47,5 +51,7 @@ export function useRegistroUsuarioScreen() {
     onSubmit,
     loading,
     goToLogin,
+    permissao,
+    setPermissao,
   };
 }

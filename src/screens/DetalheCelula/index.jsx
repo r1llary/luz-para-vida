@@ -59,6 +59,7 @@ export default function DetalheCelula() {
     celula,
     membros,
     reunioes,
+    canManage,
     formatDateBr,
     openRelatorio,
     openNovaReuniao,
@@ -143,13 +144,15 @@ export default function DetalheCelula() {
 
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitleInline}>Reuniões</Text>
-          <TouchableOpacity
-            onPress={openNovaReuniao}
-            accessibilityRole="button"
-            accessibilityLabel="Registrar nova reunião"
-          >
-            <Text style={styles.sectionLink}>Nova reunião</Text>
-          </TouchableOpacity>
+          {canManage ? (
+            <TouchableOpacity
+              onPress={openNovaReuniao}
+              accessibilityRole="button"
+              accessibilityLabel="Registrar nova reunião"
+            >
+              <Text style={styles.sectionLink}>Nova reunião</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
         <View style={styles.divider} />
 
@@ -176,24 +179,26 @@ export default function DetalheCelula() {
         <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
       </ScrollView>
 
-      <View style={[styles.bottomBar, { paddingBottom: bottomPad }]}>
-        <View style={styles.relatorioBtnWrap}>
-          <Button
-            variant="accent"
-            title="RELATÓRIO MENSAL"
-            onPress={openRelatorio}
-          />
+      {canManage ? (
+        <View style={[styles.bottomBar, { paddingBottom: bottomPad }]}>
+          <View style={styles.relatorioBtnWrap}>
+            <Button
+              variant="accent"
+              title="RELATÓRIO MENSAL"
+              onPress={openRelatorio}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.fab}
+            onPress={openRegistroMembro}
+            activeOpacity={0.9}
+            accessibilityRole="button"
+            accessibilityLabel="Cadastrar membro"
+          >
+            <Text style={styles.fabPlus}>+</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={openRegistroMembro}
-          activeOpacity={0.9}
-          accessibilityRole="button"
-          accessibilityLabel="Cadastrar membro"
-        >
-          <Text style={styles.fabPlus}>+</Text>
-        </TouchableOpacity>
-      </View>
+      ) : null}
     </SafeAreaView>
   );
 }
