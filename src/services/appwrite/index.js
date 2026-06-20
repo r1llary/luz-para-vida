@@ -9,8 +9,16 @@ export {
 } from './authService';
 
 export {
+  getFileViewUrl,
+  uploadCelulaImageFromUri,
+} from './storageAvatar';
+
+export {
   listAllCelulasAppwrite,
   listCelulasAppwrite,
+  listCelulasByIdsAppwrite,
+  listMembrosByEmailAppwrite,
+  getUserByEmailAppwrite,
   createCelulaAppwrite,
   listMembrosByCelulaAppwrite,
   createMembroAppwrite,

@@ -28,15 +28,16 @@ export default function Login() {
   } = useLoginScreen();
 
   const { height: windowHeight } = useWindowDimensions();
-
-  const scrollContentStyle = [
-    styles.scroll,
-    { minHeight: Math.max(windowHeight - 32, 480) },
-  ];
+  const scrollContentStyle = [styles.scroll, { minHeight: Math.max(windowHeight - 32, 500) }];
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <StatusBar style="light" />
+
+      {/* Decoração de fundo */}
+      <View style={styles.bgCircle1} pointerEvents="none" />
+      <View style={styles.bgCircle2} pointerEvents="none" />
+
       <KeyboardAvoidingView
         style={styles.kav}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -50,57 +51,68 @@ export default function Login() {
           bounces={false}
         >
           <View style={styles.inner}>
-            <AuthLogo style={styles.logoSpacer} />
+            {/* Logo */}
+            <View style={styles.logoWrap}>
+              <AuthLogo />
+              <Text style={styles.tagline}>Gestão de Células</Text>
+            </View>
 
-            <View style={styles.fieldBlock}>
+            {/* Card do formulário */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Entrar</Text>
+              <Text style={styles.cardSubtitle}>Acesse sua conta para continuar</Text>
+
+              <View style={styles.fieldBlock}>
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      variant="auth"
+                      placeholder="Email"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.email?.message}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      textContentType="emailAddress"
+                    />
+                  )}
+                />
+              </View>
+
               <Controller
                 control={control}
-                name="email"
+                name="senha"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
                     variant="auth"
-                    placeholder="Email"
+                    placeholder="Senha"
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
-                    error={errors.email?.message}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    textContentType="emailAddress"
+                    error={errors.senha?.message}
+                    secureTextEntry
+                    autoComplete="password"
+                    textContentType="password"
                   />
                 )}
               />
-            </View>
-            <Controller
-              control={control}
-              name="senha"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Senha"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.senha?.message}
-                  secureTextEntry
-                  autoComplete="password"
-                  textContentType="password"
+
+              {errors.root?.message ? (
+                <Text style={styles.errorRoot}>{errors.root.message}</Text>
+              ) : null}
+
+              <View style={styles.btnWrap}>
+                <Button
+                  variant="accent"
+                  title="ENTRAR"
+                  onPress={handleSubmit(onSubmit)}
+                  loading={loading}
                 />
-              )}
-            />
-
-            {errors.root?.message ? (
-              <Text style={styles.errorRoot}>{errors.root.message}</Text>
-            ) : null}
-
-            <View style={styles.btnWrap}>
-              <Button
-                variant="accent"
-                title="ENTRAR"
-                onPress={handleSubmit(onSubmit)}
-                loading={loading}
-              />
+              </View>
             </View>
 
             <TouchableOpacity
@@ -113,7 +125,7 @@ export default function Login() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

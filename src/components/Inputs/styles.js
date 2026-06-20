@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { colors, radii, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   container: {
@@ -8,44 +9,47 @@ export const styles = StyleSheet.create({
     marginBottom: 14,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+    ...type.label,
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: radii.md,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
+    fontSize: 15,
+    backgroundColor: colors.surface,
+    color: colors.text,
+  },
+  inputFocus: {
+    borderColor: colors.borderFocus,
   },
   inputError: {
-    borderColor: '#c53030',
+    borderColor: colors.error,
   },
   inputAuth: {
-    borderWidth: 0,
-    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    borderRadius: radii.md,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    backgroundColor: '#fff',
-    color: '#1e293b',
+    backgroundColor: colors.surface,
+    color: colors.text,
   },
   inputAuthError: {
-    borderWidth: 2,
-    borderColor: '#c53030',
+    borderColor: colors.error,
   },
   error: {
-    fontSize: 12,
-    color: '#c53030',
+    ...type.caption,
+    color: colors.error,
     marginTop: 4,
   },
   errorAuth: {
-    fontSize: 12,
-    color: '#7f1d1d',
+    ...type.caption,
+    color: colors.error,
     marginTop: 4,
     fontWeight: '600',
   },

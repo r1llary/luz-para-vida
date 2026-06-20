@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  Image,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -12,7 +13,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Controller } from 'react-hook-form';
 import { Input } from '../../components/Inputs';
 import { Button } from '../../components/Buttons';
-import { AuthLogo } from '../../components/AuthLogo';
 import { styles } from './styles';
 import { useRegistroCelulaScreen } from './useRegistroCelulaScreen';
 
@@ -26,6 +26,9 @@ export default function RegistroCelula() {
     membrosFields,
     appendMembro,
     removeMembro,
+    imageUri,
+    pickImagem,
+    removeImagem,
   } = useRegistroCelulaScreen();
 
   return (
@@ -44,125 +47,164 @@ export default function RegistroCelula() {
           bounces
         >
           <View style={styles.inner}>
-            <AuthLogo style={styles.logoSpacer} />
-            <Text style={styles.title}>NOVA CÉLULA</Text>
-            <Text style={styles.subtitle}>
-              Nome, dia e horário; membros opcionais
-            </Text>
+            {/* ── Imagem de capa ── */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Imagem de capa (opcional)</Text>
 
-            <Text style={styles.sectionLabel}>Informações principais</Text>
-            <Controller
-              control={control}
-              name="nomeCelula"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Nome da célula"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.nomeCelula?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="dia"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Dia (ex.: Segunda-feira)"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.dia?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="horario"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Horário (ex.: 18h)"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.horario?.message}
-                />
-              )}
-            />
+              <TouchableOpacity style={styles.imagemWrap} onPress={pickImagem} activeOpacity={0.85}>
+                {imageUri ? (
+                  <Image source={{ uri: imageUri }} style={styles.imagemPreview} resizeMode="cover" />
+                ) : (
+                  <View style={styles.imagemPlaceholder}>
+                    <View style={styles.imagemPlaceholderIcon}>
+                      <Text style={styles.imagemPlaceholderIconText}>📷</Text>
+                    </View>
+                    <Text style={styles.imagemPlaceholderText}>Toque para adicionar uma foto</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
 
-            <Text style={styles.sectionLabel}>Membros iniciais (opcional)</Text>
-            {membrosFields.map((field, index) => (
-              <View key={field.id} style={styles.membroBlock}>
-                <Controller
-                  control={control}
-                  name={`membrosIniciais.${index}.nomeCompleto`}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      variant="auth"
-                      placeholder="Nome completo"
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      error={
-                        errors.membrosIniciais?.[index]?.nomeCompleto?.message
-                      }
-                    />
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name={`membrosIniciais.${index}.telefone`}
-                  render={({ field: { onChange, onBlur, value } }) => (
-                    <Input
-                      variant="auth"
-                      placeholder="Telefone (opcional)"
-                      value={value ?? ''}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      keyboardType="phone-pad"
-                    />
-                  )}
-                />
-                <TouchableOpacity
-                  onPress={() => removeMembro(index)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Remover membro"
-                >
-                  <Text style={styles.removeMembro}>Remover</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-            <TouchableOpacity
-              onPress={appendMembro}
-              accessibilityRole="button"
-              accessibilityLabel="Adicionar membro"
-            >
-              <Text style={styles.addMembro}>+ Adicionar membro</Text>
-            </TouchableOpacity>
+              {imageUri ? (
+                <View style={styles.imagemAcoes}>
+                  <TouchableOpacity style={styles.imagemBtn} onPress={pickImagem} activeOpacity={0.85}>
+                    <Text style={styles.imagemBtnText}>Trocar foto</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.imagemBtn, styles.imagemBtnRemover]} onPress={removeImagem} activeOpacity={0.85}>
+                    <Text style={styles.imagemBtnRemoverText}>Remover</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+            </View>
 
-            <Text style={styles.hint}>
-              As reuniões da célula são registradas depois, na tela de detalhes.
-            </Text>
-
-            {errors.root?.message ? (
-              <Text style={styles.errorRoot}>{errors.root.message}</Text>
-            ) : null}
-
-            <View style={styles.btnWrap}>
-              <Button
-                variant="accent"
-                title="CADASTRAR"
-                onPress={handleSubmit(onSubmit)}
-                loading={submitting}
+            {/* ── Informações principais ── */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Informações principais</Text>
+              <Controller
+                control={control}
+                name="nomeCelula"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Nome da célula"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.nomeCelula?.message}
+                  />
+                )}
               />
+              <Controller
+                control={control}
+                name="dia"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Dia (ex.: Segunda-feira)"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.dia?.message}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="horario"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Horário (ex.: 18h)"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.horario?.message}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="local"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Endereço completo (abre no Maps)"
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                  />
+                )}
+              />
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Membros iniciais (opcional)</Text>
+              {membrosFields.map((field, index) => (
+                <View key={field.id} style={styles.membroBlock}>
+                  <Controller
+                    control={control}
+                    name={`membrosIniciais.${index}.nomeCompleto`}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        variant="auth"
+                        placeholder="Nome completo"
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        error={errors.membrosIniciais?.[index]?.nomeCompleto?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name={`membrosIniciais.${index}.telefone`}
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <Input
+                        variant="auth"
+                        placeholder="Telefone (opcional)"
+                        value={value ?? ''}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        keyboardType="phone-pad"
+                      />
+                    )}
+                  />
+                  <TouchableOpacity
+                    onPress={() => removeMembro(index)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Remover membro"
+                  >
+                    <Text style={styles.removeMembro}>Remover</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+              <TouchableOpacity
+                onPress={appendMembro}
+                accessibilityRole="button"
+                accessibilityLabel="Adicionar membro"
+              >
+                <Text style={styles.addMembro}>+ Adicionar membro</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.hint}>
+                As reuniões da célula são registradas depois, na tela de detalhes.
+              </Text>
+
+              {errors.root?.message ? (
+                <Text style={styles.errorRoot}>{errors.root.message}</Text>
+              ) : null}
+
+              <View style={styles.btnWrap}>
+                <Button
+                  variant="accent"
+                  title="CADASTRAR"
+                  onPress={handleSubmit(onSubmit)}
+                  loading={submitting}
+                />
+              </View>
             </View>
           </View>
 
-          <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

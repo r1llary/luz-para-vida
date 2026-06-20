@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,24 @@ import { useDetalheCelulaScreen } from './useDetalheCelulaScreen';
 
 const LOGO_HEADER = require('../../../assets/logo.png');
 
+const MESES_ABREV = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+
+function initials(name = '') {
+  return name.trim().split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
+}
+
+function parseDateBadge(raw) {
+  if (!raw) return null;
+  const parts = String(raw).split(/[-/]/);
+  if (parts.length === 3) {
+    const [y, m, d] = parts.length === 3 && parts[0].length === 4
+      ? [Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])]
+      : [Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])];
+    if (!isNaN(d) && !isNaN(m)) return { day: String(d).padStart(2, '0'), month: MESES_ABREV[m] || '' };
+  }
+  return null;
+}
+
 function ScreenHeader({ title, onOpenMenu }) {
   return (
     <View style={styles.screenHeader}>
@@ -24,11 +43,9 @@ function ScreenHeader({ title, onOpenMenu }) {
         accessibilityRole="button"
         accessibilityLabel="Abrir menu"
       >
-        <View>
-          <View style={styles.menuBar} />
-          <View style={styles.menuBar} />
-          <View style={[styles.menuBar, styles.menuBarLast]} />
-        </View>
+        <View style={styles.menuBar} />
+        <View style={styles.menuBar} />
+        <View style={[styles.menuBar, styles.menuBarLast]} />
       </TouchableOpacity>
       <Text style={styles.headerTitle} numberOfLines={1}>
         {title}
@@ -43,13 +60,19 @@ function ScreenHeader({ title, onOpenMenu }) {
   );
 }
 
+function openMaps(address) {
+  if (!address) return;
+  Linking.openURL(`https://maps.google.com/?q=${encodeURIComponent(address)}`);
+}
+
 function HeroPlaceholder() {
   return (
-    <View style={styles.placeholderInner}>
-      <View style={styles.placeholderRow}>
-        <View style={styles.placeholderSun} />
-        <View style={styles.placeholderMountain} />
-      </View>
+    <View style={styles.heroPlaceholder}>
+      <View style={styles.heroPlaceholderCircle1} />
+      <View style={styles.heroPlaceholderCircle2} />
+      <View style={styles.heroPlaceholderRoof} />
+      <View style={styles.heroPlaceholderBody} />
+      <View style={styles.heroAccentBar} />
     </View>
   );
 }
@@ -69,7 +92,7 @@ export default function DetalheCelula() {
   } = useDetalheCelulaScreen();
 
   const insets = useSafeAreaInsets();
-  const bottomPad = Math.max(insets.bottom, 10);
+  const bottomPad = Math.max(insets.bottom, 12);
 
   if (!celula) {
     return (
@@ -82,18 +105,10 @@ export default function DetalheCelula() {
     );
   }
 
-  const metaLinha =
-    celula.dia && celula.horario
-      ? `${celula.dia} ${celula.horario}`
-      : [celula.dia, celula.horario].filter(Boolean).join(' ');
-
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <StatusBar style="light" />
-      <ScreenHeader
-        title={celula.nomeCelula || 'Célula'}
-        onOpenMenu={openMenu}
-      />
+      <ScreenHeader title={celula.nomeCelula || 'Célula'} onOpenMenu={openMenu} />
 
       <ScrollView
         style={styles.scrollFlex}
@@ -101,6 +116,7 @@ export default function DetalheCelula() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* ── Hero ── */}
         <View style={styles.heroWrap}>
           {celula.imagemUrl ? (
             <Image
@@ -111,74 +127,128 @@ export default function DetalheCelula() {
           ) : (
             <HeroPlaceholder />
           )}
+          <View style={styles.heroAccentBar} />
         </View>
 
-        <View style={styles.infoRow}>
+        {/* ── Info card ── */}
+        <View style={styles.infoCard}>
           <Text style={styles.infoNome} numberOfLines={2}>
             {celula.nomeCelula}
           </Text>
-          <Text style={styles.infoMeta} numberOfLines={2}>
-            {metaLinha}
-          </Text>
+          <View style={styles.infoMetaRow}>
+            {celula.dia ? (
+              <View style={styles.infoChip}>
+                <Text style={styles.infoChipText}>{celula.dia}</Text>
+              </View>
+            ) : null}
+            {celula.horario ? (
+              <View style={styles.infoChip}>
+                <Text style={styles.infoChipText}>{celula.horario}</Text>
+              </View>
+            ) : null}
+            {celula.local ? (
+              <TouchableOpacity
+                style={[styles.infoChip, styles.infoChipMap]}
+                onPress={() => openMaps(celula.local)}
+                activeOpacity={0.75}
+                accessibilityRole="link"
+                accessibilityLabel={`Abrir no Maps: ${celula.local}`}
+              >
+                <Text style={styles.infoChipMapPin}>📍</Text>
+                <Text style={styles.infoChipText} numberOfLines={1}>{celula.local}</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
 
-        {celula.local ? (
-          <Text style={styles.local}>Local: {celula.local}</Text>
-        ) : null}
-
-        <Text style={styles.sectionTitle}>Membros</Text>
-        <View style={styles.divider} />
-
-        {membros.length === 0 ? (
-          <Text style={styles.empty}>Nenhum membro cadastrado.</Text>
-        ) : (
-          membros.map((m) => (
-            <View key={m.id} style={styles.membroRow}>
-              <Text style={styles.membroNome}>{m.nomeCompleto}</Text>
-              {m.email ? (
-                <Text style={styles.membroEmail}>{m.email}</Text>
-              ) : null}
-            </View>
-          ))
-        )}
-
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitleInline}>Reuniões</Text>
-          {canManage ? (
-            <TouchableOpacity
-              onPress={openNovaReuniao}
-              accessibilityRole="button"
-              accessibilityLabel="Registrar nova reunião"
-            >
-              <Text style={styles.sectionLink}>Nova reunião</Text>
-            </TouchableOpacity>
-          ) : null}
+        {/* ── Membros ── */}
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>Membros</Text>
+            <Text style={styles.sectionTitle}>{membros.length}</Text>
+          </View>
+          {membros.length === 0 ? (
+            <Text style={styles.sectionEmpty}>Nenhum membro cadastrado.</Text>
+          ) : (
+            membros.map((m, idx) => (
+              <View
+                key={m.id}
+                style={[
+                  styles.membroRow,
+                  idx === membros.length - 1 && { borderBottomWidth: 0 },
+                ]}
+              >
+                <View style={styles.membroAvatar}>
+                  <Text style={styles.membroAvatarText}>{initials(m.nomeCompleto)}</Text>
+                </View>
+                <View style={styles.membroInfo}>
+                  <Text style={styles.membroNome}>{m.nomeCompleto}</Text>
+                  {m.email ? (
+                    <Text style={styles.membroEmail}>{m.email}</Text>
+                  ) : null}
+                </View>
+              </View>
+            ))
+          )}
         </View>
-        <View style={styles.divider} />
 
-        {reunioes.length === 0 ? (
-          <Text style={styles.empty}>Nenhuma reunião registrada.</Text>
-        ) : (
-          reunioes.map((r) => (
-            <TouchableOpacity
-              key={r.id}
-              style={styles.reuniaoRow}
-              onPress={() => openDetalheReuniao(r)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.reuniaoData}>
-                {formatDateBr(r.dataReuniao) || r.dataReuniao}
-              </Text>
-              <Text style={styles.reuniaoTema} numberOfLines={2}>
-                {r.temaMinistrado || '—'}
-              </Text>
-            </TouchableOpacity>
-          ))
-        )}
+        {/* ── Reuniões ── */}
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionTitle}>Reuniões</Text>
+            {canManage ? (
+              <TouchableOpacity
+                onPress={openNovaReuniao}
+                accessibilityRole="button"
+                accessibilityLabel="Registrar nova reunião"
+              >
+                <Text style={styles.sectionLink}>+ Nova reunião</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          {reunioes.length === 0 ? (
+            <Text style={styles.sectionEmpty}>Nenhuma reunião registrada.</Text>
+          ) : (
+            reunioes.map((r, idx) => {
+              const badge = parseDateBadge(r.dataReuniao);
+              return (
+                <TouchableOpacity
+                  key={r.id}
+                  style={[
+                    styles.reuniaoRow,
+                    idx === reunioes.length - 1 && { borderBottomWidth: 0 },
+                  ]}
+                  onPress={() => openDetalheReuniao(r)}
+                  activeOpacity={0.85}
+                >
+                  <View style={styles.reuniaoDateBadge}>
+                    {badge ? (
+                      <>
+                        <Text style={styles.reuniaoDateDay}>{badge.day}</Text>
+                        <Text style={styles.reuniaoDateMonth}>{badge.month}</Text>
+                      </>
+                    ) : (
+                      <Text style={styles.reuniaoDateDay}>—</Text>
+                    )}
+                  </View>
+                  <View style={styles.reuniaoInfo}>
+                    <Text style={styles.reuniaoData}>
+                      {formatDateBr(r.dataReuniao) || r.dataReuniao || 'Sem data'}
+                    </Text>
+                    <Text style={styles.reuniaoTema} numberOfLines={2}>
+                      {r.temaMinistrado || 'Sem tema registrado'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          )}
+        </View>
 
-        <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+        <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
       </ScrollView>
 
+      {/* ── Bottom bar (só lider/admin) ── */}
       {canManage ? (
         <View style={[styles.bottomBar, { paddingBottom: bottomPad }]}>
           <View style={styles.relatorioBtnWrap}>
@@ -191,7 +261,7 @@ export default function DetalheCelula() {
           <TouchableOpacity
             style={styles.fab}
             onPress={openRegistroMembro}
-            activeOpacity={0.9}
+            activeOpacity={0.88}
             accessibilityRole="button"
             accessibilityLabel="Cadastrar membro"
           >

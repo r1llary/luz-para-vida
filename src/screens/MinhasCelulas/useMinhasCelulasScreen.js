@@ -9,7 +9,7 @@ import { CELULAS_MOCK } from '../../mocks/celulasMock';
 export function useMinhasCelulasScreen() {
   const navigation = useNavigation();
   const { user, canManage } = useAuth();
-  const { celulas } = useCelulas();
+  const { celulas, loadingCelulas } = useCelulas();
 
   const celulasExibidas = useMemo(
     () => (USE_CELULAS_LIST_MOCK ? CELULAS_MOCK : celulas),
@@ -35,6 +35,7 @@ export function useMinhasCelulasScreen() {
     user,
     canManage,
     celulas: celulasExibidas,
+    loadingCelulas,
     usandoMockLista: USE_CELULAS_LIST_MOCK,
     handleCadastrar,
     openDrawer,

@@ -1,47 +1,60 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   scrollOuter: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.bg,
   },
   container: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: spacing[4],
+    paddingBottom: spacing[10],
   },
   wrap: {
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
-    backgroundColor: BG,
+    padding: spacing[6],
+    backgroundColor: colors.bg,
   },
+
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.xl,
+    padding: spacing[5],
+    marginBottom: spacing[3],
+    ...shadows.sm,
+  },
+  cardTitle: {
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[4],
+  },
+
   title: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#fff',
+    ...type.h3,
+    color: colors.text,
     textAlign: 'center',
-    letterSpacing: 0.5,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 15,
+    ...type.body,
     fontWeight: '600',
-    color: 'rgba(255,255,255,0.92)',
+    color: colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: spacing[2],
   },
   hint: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
+    ...type.caption,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 18,
+    marginBottom: spacing[4],
+    lineHeight: 17,
+    fontWeight: '400',
   },
+
   rowInputs: {
     flexDirection: 'row',
-    marginBottom: 16,
+    marginBottom: spacing[4],
   },
   inputHalf: {
     flex: 1,
@@ -53,67 +66,66 @@ export const styles = StyleSheet.create({
   inputHalfRight: {
     marginLeft: 6,
   },
+
+  // Card de resumo
   cardResumo: {
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    backgroundColor: colors.primaryLight,
+    borderRadius: radii.lg,
+    padding: spacing[4],
+    marginBottom: spacing[4],
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderColor: colors.border,
   },
   resumoTitulo: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: 1,
-    marginBottom: 10,
-    textTransform: 'uppercase',
+    ...type.label,
+    color: colors.primary,
+    marginBottom: spacing[3],
   },
   resumoLinha: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
+    ...type.body,
+    color: colors.textSecondary,
     marginBottom: 6,
   },
   resumoNum: {
     fontWeight: '800',
-    color: '#fff',
+    color: colors.primary,
   },
+
   secReunioes: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 10,
-    letterSpacing: 0.3,
+    ...type.h4,
+    color: colors.text,
+    marginBottom: spacing[3],
   },
   reuniaoRow: {
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingVertical: 13,
+    paddingHorizontal: spacing[3],
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.22)',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 8,
-    marginBottom: 8,
+    borderBottomColor: colors.borderLight,
+    backgroundColor: colors.bgAlt,
+    borderRadius: radii.md,
+    marginBottom: spacing[2],
   },
   reuniaoData: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 4,
+    ...type.body,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 3,
   },
   reuniaoTema: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.85)',
+    ...type.caption,
+    color: colors.textSecondary,
     fontStyle: 'italic',
   },
+
   empty: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.65)',
+    ...type.bodySm,
+    color: colors.textMuted,
     fontStyle: 'italic',
-    paddingVertical: 12,
+    paddingVertical: spacing[3],
   },
   error: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.85)',
+    ...type.body,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
 });

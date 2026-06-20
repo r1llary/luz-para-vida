@@ -1,11 +1,10 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.primaryDark,
   },
   kav: {
     flex: 1,
@@ -16,58 +15,112 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'stretch',
     width: '100%',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
-    paddingBottom: 28,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[5],
+    paddingBottom: spacing[8],
   },
+
+  // Background circles (decorativos)
+  bgCircle1: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: 'rgba(201,162,39,0.07)',
+    top: -80,
+    right: -60,
+  },
+  bgCircle2: {
+    position: 'absolute',
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    bottom: 40,
+    left: -50,
+  },
+
   inner: {
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
   },
-  logoSpacer: {
-    marginBottom: 28,
+  logoWrap: {
+    alignItems: 'center',
+    marginBottom: spacing[8],
   },
+  tagline: {
+    ...type.caption,
+    color: 'rgba(255,255,255,0.45)',
+    textAlign: 'center',
+    letterSpacing: 1.2,
+    marginTop: spacing[2],
+    textTransform: 'uppercase',
+  },
+
+  // Card branco com o formulário
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.xl,
+    padding: spacing[5],
+    ...shadows.lg,
+  },
+  cardTitle: {
+    ...type.h3,
+    color: colors.text,
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    ...type.bodySm,
+    color: colors.textSecondary,
+    marginBottom: spacing[5],
+  },
+
   fieldBlock: {
-    marginBottom: 8,
+    marginBottom: 0,
   },
   errorRoot: {
-    color: '#7f1d1d',
-    fontSize: 14,
-    marginBottom: 14,
-    textAlign: 'center',
-    fontWeight: '600',
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    ...type.caption,
+    color: colors.error,
+    backgroundColor: colors.errorBg,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radii.sm,
+    marginBottom: spacing[3],
+    textAlign: 'center',
+    fontWeight: '600',
     overflow: 'hidden',
   },
   btnWrap: {
-    marginTop: 8,
-    width: '100%',
+    marginTop: spacing[3],
   },
+
+  // Link para cadastro
   link: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginTop: 24,
+    marginTop: spacing[5],
     paddingHorizontal: 4,
   },
-  linkText: { fontSize: 15, color: 'rgba(255,255,255,0.95)' },
+  linkText: {
+    ...type.body,
+    color: 'rgba(255,255,255,0.6)',
+  },
   linkBold: {
-    fontSize: 15,
+    ...type.body,
     fontWeight: '800',
-    color: '#fff',
+    color: colors.accentAlt,
     letterSpacing: 0.5,
   },
+
   footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
+    ...type.caption,
+    color: 'rgba(255,255,255,0.3)',
     textAlign: 'center',
-    marginTop: 28,
-    paddingHorizontal: 16,
+    marginTop: spacing[6],
+    paddingHorizontal: spacing[4],
     alignSelf: 'center',
     width: '100%',
     maxWidth: 400,

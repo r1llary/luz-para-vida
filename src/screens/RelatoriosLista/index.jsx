@@ -22,11 +22,9 @@ function ScreenHeader({ onOpenMenu }) {
         accessibilityRole="button"
         accessibilityLabel="Abrir menu"
       >
-        <View>
-          <View style={styles.menuBar} />
-          <View style={styles.menuBar} />
-          <View style={[styles.menuBar, styles.menuBarLast]} />
-        </View>
+        <View style={styles.menuBar} />
+        <View style={styles.menuBar} />
+        <View style={[styles.menuBar, styles.menuBarLast]} />
       </TouchableOpacity>
       <Text style={styles.headerTitle} numberOfLines={1}>
         Relatórios
@@ -57,7 +55,7 @@ export default function RelatoriosLista() {
         onPress={() => openRelatorio(item)}
         activeOpacity={0.85}
       >
-        <View style={{ flex: 1 }}>
+        <View style={styles.rowLeft}>
           <Text style={styles.nome} numberOfLines={2}>
             {item.nomeCelula}
           </Text>
@@ -68,24 +66,24 @@ export default function RelatoriosLista() {
         <Text style={styles.chevron}>›</Text>
       </TouchableOpacity>
     ),
-    [openRelatorio]
+    [openRelatorio],
   );
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <StatusBar style="light" />
       <ScreenHeader onOpenMenu={openDrawer} />
-      {__DEV__ && usandoMockLista ? (
-        <Text style={[styles.intro, { paddingHorizontal: 16, paddingTop: 8 }]}>
-          Lista de teste — mockFlags.js
-        </Text>
-      ) : null}
       <ScrollView
         style={styles.scrollFlex}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {__DEV__ && usandoMockLista ? (
+          <Text style={[styles.intro, { fontStyle: 'italic' }]}>
+            Lista de teste — mockFlags.js
+          </Text>
+        ) : null}
         <Text style={styles.intro}>
           Escolha uma célula para ver o relatório mensal (filtro por mês e ano).
         </Text>
@@ -94,7 +92,7 @@ export default function RelatoriosLista() {
         ) : (
           celulas.map((c) => renderRow(c))
         )}
-        <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+        <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
       </ScrollView>
     </SafeAreaView>
   );

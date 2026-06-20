@@ -1,4 +1,11 @@
 import { useState, useCallback, useEffect } from 'react';
+
+// Converte DD/MM/AAAA → YYYY-MM-DD para armazenamento e filtros
+function toISODate(br) {
+  const match = String(br).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (match) return `${match[3]}-${match[2]}-${match[1]}`;
+  return br;
+}
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -40,7 +47,10 @@ export function useNovaReuniaoScreen() {
       if (!celula?.id) return;
       setSubmitting(true);
       try {
-        await addReuniao(celula.id, data);
+        await addReuniao(celula.id, {
+          ...data,
+          dataReuniao: toISODate(data.dataReuniao),
+        });
         navigation.goBack();
       } catch (e) {
         setError('root', {

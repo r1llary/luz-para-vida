@@ -1,11 +1,10 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.bg,
   },
   kav: {
     flex: 1,
@@ -15,83 +14,109 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'stretch',
     width: '100%',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 36,
+    paddingHorizontal: spacing[4],
+    paddingTop: spacing[4],
+    paddingBottom: spacing[8],
   },
   inner: {
     width: '100%',
     maxWidth: 440,
     alignSelf: 'center',
   },
-  logoSpacer: {
-    marginBottom: 12,
+
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.xl,
+    padding: spacing[5],
+    marginBottom: spacing[3],
+    ...shadows.sm,
   },
-  title: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 4,
-    letterSpacing: 1,
-    paddingHorizontal: 8,
+  cardTitle: {
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[4],
   },
-  subtitle: {
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.92)',
-    textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 20,
-    fontWeight: '500',
-    paddingHorizontal: 8,
-  },
+
   sectionLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.95)',
-    textAlign: 'center',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    marginBottom: 12,
-    marginTop: 8,
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[3],
+    marginTop: spacing[2],
   },
+
   errorRoot: {
-    color: '#7f1d1d',
-    fontSize: 14,
-    marginBottom: 14,
-    textAlign: 'center',
-    fontWeight: '600',
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    ...type.caption,
+    color: colors.error,
+    backgroundColor: colors.errorBg,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radii.sm,
+    marginBottom: spacing[3],
+    textAlign: 'center',
+    fontWeight: '600',
     overflow: 'hidden',
   },
   btnWrap: {
-    marginTop: 12,
-    width: '100%',
-    marginBottom: 8,
+    marginTop: spacing[3],
   },
+
   footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
+    ...type.caption,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginTop: 20,
-    paddingHorizontal: 16,
-    alignSelf: 'center',
-    width: '100%',
-    maxWidth: 440,
+    marginTop: spacing[5],
+    opacity: 0.5,
   },
+
   errorWrap: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
-    backgroundColor: BG,
+    padding: spacing[8],
   },
   error: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
+    ...type.body,
+    color: colors.textSecondary,
     textAlign: 'center',
+  },
+
+  searchHint: {
+    ...type.caption,
+    color: colors.textMuted,
+    marginBottom: spacing[3],
+    lineHeight: 18,
+  },
+  searchBtnWrap: {
+    marginTop: spacing[2],
+  },
+  buscaResultado: {
+    marginTop: spacing[3],
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: radii.md,
+    backgroundColor: '#D1FAE5',
+    borderWidth: 1,
+    borderColor: '#6EE7B7',
+  },
+  buscaResultadoText: {
+    ...type.caption,
+    color: '#065F46',
+    fontWeight: '600',
+  },
+  buscaResultadoNeutro: {
+    backgroundColor: colors.bgAlt,
+    borderColor: colors.borderLight,
+  },
+  buscaResultadoNeutroText: {
+    ...type.caption,
+    color: colors.textMuted,
+  },
+
+  cepCarregando: {
+    ...type.caption,
+    color: colors.primary,
+    fontStyle: 'italic',
+    marginBottom: spacing[2],
+    marginTop: -4,
   },
 });

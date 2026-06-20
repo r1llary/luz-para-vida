@@ -1,106 +1,103 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
-export const HEADER_BG = '#B89550';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.bg,
   },
+
+  // ── Header ──────────────────────────────────────────────
   screenHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: HEADER_BG,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing[4],
+    paddingVertical: 14,
   },
   menuBtn: {
-    padding: 10,
-    marginLeft: -6,
+    width: 36,
+    height: 36,
+    borderRadius: radii.sm,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   menuBar: {
-    width: 22,
-    height: 3,
-    borderRadius: 2,
+    width: 18,
+    height: 2,
     backgroundColor: '#fff',
-    marginBottom: 5,
+    borderRadius: 2,
+    marginVertical: 2,
   },
-  menuBarLast: {
-    marginBottom: 0,
-  },
+  menuBarLast: { width: 12 },
   headerTitle: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '800',
+    ...type.h3,
     color: '#fff',
+    flex: 1,
     textAlign: 'center',
-    letterSpacing: 0.3,
-    paddingHorizontal: 8,
   },
   headerLogo: {
-    width: 44,
+    width: 36,
     height: 36,
-    marginRight: -4,
   },
-  scrollFlex: {
-    flex: 1,
-  },
+
+  // ── Content ──────────────────────────────────────────────
+  scrollFlex: { flex: 1 },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-    paddingTop: 12,
+    paddingHorizontal: spacing[4],
+    paddingBottom: spacing[6],
+    paddingTop: spacing[4],
   },
   intro: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.88)',
-    marginBottom: 14,
+    ...type.bodySm,
+    color: colors.textSecondary,
+    marginBottom: spacing[4],
     lineHeight: 20,
   },
+
+  // ── List rows ────────────────────────────────────────────
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
+    paddingHorizontal: spacing[4],
+    borderRadius: radii.lg,
+    backgroundColor: colors.surface,
+    marginBottom: spacing[2],
+    ...shadows.sm,
   },
+  rowLeft: { flex: 1, marginRight: spacing[3] },
   nome: {
-    flex: 1,
-    fontSize: 15,
+    ...type.body,
     fontWeight: '700',
-    color: '#fff',
-    marginRight: 12,
+    color: colors.text,
   },
   meta: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    marginTop: 4,
+    ...type.caption,
+    color: colors.textMuted,
+    marginTop: 3,
   },
   chevron: {
-    fontSize: 18,
-    color: 'rgba(255,255,255,0.85)',
+    fontSize: 16,
+    color: colors.textMuted,
     fontWeight: '600',
   },
+
   empty: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.65)',
+    ...type.body,
+    color: colors.textMuted,
     fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 32,
-    paddingHorizontal: 16,
+    marginTop: spacing[8],
+    paddingHorizontal: spacing[4],
   },
   footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.65)',
+    ...type.caption,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginTop: 28,
+    marginTop: spacing[6],
+    opacity: 0.5,
   },
 });

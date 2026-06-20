@@ -15,7 +15,7 @@ export function MainDrawer() {
         drawerStyle: {
           width: '82%',
           maxWidth: 340,
-          backgroundColor: '#CDAA6D',
+          backgroundColor: '#0D1B38',
         },
         overlayColor: 'rgba(0,0,0,0.45)',
       }}

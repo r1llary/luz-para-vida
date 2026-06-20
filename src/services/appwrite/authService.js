@@ -219,13 +219,9 @@ export async function updateProfileInAppwrite(payload, currentUser) {
   let fotoPerfilId = currentUser.fotoPerfil || '';
   if (removeFoto) {
     fotoPerfilId = '';
-  } else if (fotoUri && BUCKET_AVATARS_ID) {
-    try {
-      const id = await uploadAvatarFromUri(fotoUri, userId);
-      if (id) fotoPerfilId = id;
-    } catch (_) {
-      /* mantém foto anterior */
-    }
+  } else if (fotoUri) {
+    const id = await uploadAvatarFromUri(fotoUri, userId);
+    if (id) fotoPerfilId = id;
   }
 
   if (databases && DATABASE_ID && COLLECTION_IDS.usuarios) {

@@ -1,71 +1,108 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.bg,
   },
   scroll: {
     flexGrow: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 32,
-    paddingTop: 12,
+    paddingHorizontal: spacing[4],
+    paddingBottom: spacing[8],
+    paddingTop: spacing[4],
+  },
+
+  // Cabeçalho da reunião
+  headerCard: {
+    backgroundColor: colors.primary,
+    borderRadius: radii.xl,
+    padding: spacing[5],
+    marginBottom: spacing[3],
+    ...shadows.md,
+    alignItems: 'center',
   },
   celulaNome: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.85)',
-    marginBottom: 6,
-    textAlign: 'center',
+    ...type.caption,
+    color: 'rgba(255,255,255,0.6)',
+    marginBottom: 4,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
+    ...type.h2,
     color: '#fff',
-    marginBottom: 20,
     textAlign: 'center',
   },
+  accentBar: {
+    height: 3,
+    width: 48,
+    backgroundColor: colors.accent,
+    borderRadius: 2,
+    marginTop: spacing[3],
+  },
+
+  // Seções de detalhe
+  detailCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
+    padding: spacing[4],
+    marginBottom: spacing[3],
+    ...shadows.sm,
+  },
   row: {
-    marginBottom: 18,
-    paddingBottom: 14,
+    marginBottom: spacing[4],
+    paddingBottom: spacing[4],
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.2)',
+    borderBottomColor: colors.borderLight,
+  },
+  rowLast: {
+    marginBottom: 0,
+    paddingBottom: 0,
+    borderBottomWidth: 0,
   },
   label: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1,
-    color: 'rgba(255,255,255,0.75)',
-    textTransform: 'uppercase',
+    ...type.label,
+    color: colors.textMuted,
     marginBottom: 6,
   },
   value: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.95)',
+    ...type.body,
+    color: colors.text,
     lineHeight: 22,
   },
   presencaList: {
     marginTop: 4,
+    gap: 6,
   },
   presencaItem: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.95)',
-    lineHeight: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[2],
   },
+  presencaDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.accent,
+  },
+  presencaText: {
+    ...type.body,
+    color: colors.text,
+  },
+
   empty: {
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.65)',
+    ...type.body,
+    color: colors.textMuted,
+    fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: spacing[10],
   },
   footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.65)',
+    ...type.caption,
+    color: colors.textMuted,
     textAlign: 'center',
-    marginTop: 28,
+    marginTop: spacing[5],
+    opacity: 0.5,
   },
 });

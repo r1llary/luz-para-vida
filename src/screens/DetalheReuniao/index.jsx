@@ -32,46 +32,54 @@ export default function DetalheReuniao() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {celulaNome ? (
-          <Text style={styles.celulaNome}>{celulaNome}</Text>
-        ) : null}
-        <Text style={styles.title}>{dataLabel || reuniao.dataReuniao}</Text>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Visitantes</Text>
-          <Text style={styles.value}>{String(reuniao.visitantes ?? 0)}</Text>
+        {/* Cabeçalho com data */}
+        <View style={styles.headerCard}>
+          {celulaNome ? (
+            <Text style={styles.celulaNome}>{celulaNome}</Text>
+          ) : null}
+          <Text style={styles.title}>{dataLabel || reuniao.dataReuniao}</Text>
+          <View style={styles.accentBar} />
         </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Membros presentes</Text>
-          {temPresencaPorNome ? (
-            <View style={styles.presencaList}>
-              {nomesPresentes.map((nome, idx) => (
-                <Text key={`${nome}-${idx}`} style={styles.presencaItem}>
-                  • {nome}
-                </Text>
-              ))}
-            </View>
-          ) : (
-            <Text style={styles.value}>
-              {legacyCount > 0
-                ? `${legacyCount} (registro anterior — apenas quantidade)`
-                : '—'}
-            </Text>
-          )}
+        {/* Detalhes */}
+        <View style={styles.detailCard}>
+          <View style={styles.row}>
+            <Text style={styles.label}>Visitantes</Text>
+            <Text style={styles.value}>{String(reuniao.visitantes ?? 0)}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Membros presentes</Text>
+            {temPresencaPorNome ? (
+              <View style={styles.presencaList}>
+                {nomesPresentes.map((nome, idx) => (
+                  <View key={`${nome}-${idx}`} style={styles.presencaItem}>
+                    <View style={styles.presencaDot} />
+                    <Text style={styles.presencaText}>{nome}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.value}>
+                {legacyCount > 0
+                  ? `${legacyCount} (registro anterior — apenas quantidade)`
+                  : '—'}
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>Tema ministrado</Text>
+            <Text style={styles.value}>{reuniao.temaMinistrado || '—'}</Text>
+          </View>
+
+          <View style={[styles.row, styles.rowLast]}>
+            <Text style={styles.label}>Texto base</Text>
+            <Text style={styles.value}>{reuniao.textoBase?.trim() || '—'}</Text>
+          </View>
         </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>Tema ministrado</Text>
-          <Text style={styles.value}>{reuniao.temaMinistrado || '—'}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Texto base</Text>
-          <Text style={styles.value}>{reuniao.textoBase?.trim() || '—'}</Text>
-        </View>
-
-        <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+        <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
       </ScrollView>
     </SafeAreaView>
   );

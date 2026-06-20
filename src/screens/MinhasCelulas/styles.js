@@ -1,198 +1,254 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
-export const HEADER_BG = '#B89550';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.bg,
   },
+
+  // ── Header ──────────────────────────────────────────────
   screenHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: HEADER_BG,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: colors.primary,
+    paddingHorizontal: spacing[4],
+    paddingVertical: 14,
   },
   menuBtn: {
-    padding: 10,
-    marginLeft: -6,
+    width: 36,
+    height: 36,
+    borderRadius: radii.sm,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   menuBar: {
-    width: 22,
-    height: 3,
-    borderRadius: 2,
+    width: 18,
+    height: 2,
     backgroundColor: '#fff',
-    marginBottom: 5,
+    borderRadius: 2,
+    marginVertical: 2,
   },
-  menuBarLast: {
-    marginBottom: 0,
-  },
+  menuBarLast: { width: 12 },
   headerTitle: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '800',
+    ...type.h3,
     color: '#fff',
+    flex: 1,
     textAlign: 'center',
-    letterSpacing: 0.3,
-    paddingHorizontal: 8,
   },
   headerLogo: {
-    width: 44,
+    width: 36,
     height: 36,
-    marginRight: -4,
   },
-  scrollFlex: {
+
+  // ── Skeleton loading ─────────────────────────────────────
+  skeletonGrid: {
+    flexDirection: 'row',
+    gap: spacing[3],
+    paddingHorizontal: spacing[4],
+    paddingTop: spacing[4],
+  },
+  skeletonCard: {
     flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
+    ...shadows.sm,
   },
-  emptyScrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-    paddingBottom: 100,
-    alignItems: 'center',
+  skeletonImage: {
+    height: 130,
+    backgroundColor: colors.bgAlt,
   },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 10,
+  skeletonBody: {
+    padding: spacing[3],
+    gap: spacing[2],
   },
-  emptyText: {
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.88)',
-    textAlign: 'center',
-    marginBottom: 8,
-    lineHeight: 22,
+  skeletonLine: {
+    height: 11,
+    borderRadius: radii.xs,
+    backgroundColor: colors.bgAlt,
   },
-  emptyHint: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.72)',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 19,
-    paddingHorizontal: 8,
-  },
-  mockHint: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.55)',
-    textAlign: 'center',
-    marginBottom: 12,
-    fontStyle: 'italic',
-  },
-  listFlex: {
-    flex: 1,
-  },
+
+  // ── Lista ────────────────────────────────────────────────
+  listFlex: { flex: 1 },
   listContent: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 100,
+    paddingHorizontal: spacing[4],
+    paddingTop: spacing[4],
+    paddingBottom: spacing[10],
   },
   columnWrap: {
-    justifyContent: 'space-between',
-    marginBottom: 12,
+    gap: spacing[3],
+    marginBottom: spacing[3],
   },
+  scrollFlex: { flex: 1 },
+
+  // ── Card ─────────────────────────────────────────────────
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
     overflow: 'hidden',
-    marginBottom: 4,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
+    ...shadows.md,
   },
   cardImageWrap: {
-    height: 104,
-    backgroundColor: '#e8e8e8',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 130,
+    overflow: 'hidden',
   },
   cardImage: {
     width: '100%',
     height: '100%',
   },
+
+  // Placeholder da imagem do card
   placeholderInner: {
-    opacity: 0.45,
-  },
-  placeholderRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  placeholderMountain: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 22,
-    borderRightWidth: 22,
-    borderBottomWidth: 28,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: '#b4b4b4',
-  },
-  placeholderSun: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#d4d4d4',
-    marginBottom: 6,
-    marginRight: 6,
-  },
-  cardBody: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-  cardNome: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#c53030',
-    marginBottom: 6,
-  },
-  cardDia: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0f172a',
-    marginBottom: 2,
-  },
-  cardHorario: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    textAlign: 'center',
-    marginTop: 8,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  fab: {
-    position: 'absolute',
+    flex: 1,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#F28537',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    zIndex: 20,
+  },
+  placeholderCircle1: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    top: -30,
+    right: -20,
+  },
+  placeholderCircle2: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    bottom: -20,
+    left: -10,
+  },
+  placeholderIcon: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  placeholderRoof: {
+    width: 38,
+    height: 18,
+    borderRadius: 3,
+    backgroundColor: colors.accent + 'BB',
+  },
+  placeholderBody: {
+    width: 34,
+    height: 24,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+
+  cardBody: {
+    padding: spacing[3],
+  },
+  cardNome: {
+    ...type.h4,
+    color: colors.text,
+    marginBottom: 5,
+  },
+  cardMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 2,
+  },
+  cardMetaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: colors.textMuted,
+    marginHorizontal: 2,
+  },
+  cardMetaText: {
+    ...type.bodySm,
+    color: colors.textSecondary,
+  },
+  cardAccentBar: {
+    height: 3,
+    backgroundColor: colors.accent,
+  },
+
+  // ── Empty state ──────────────────────────────────────────
+  emptyScrollContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing[8],
+    paddingVertical: spacing[12],
+  },
+  emptyIconWrap: {
+    width: 72,
+    height: 72,
+    borderRadius: radii.full,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing[5],
+  },
+  emptyIconInner: {
+    width: 36,
+    height: 36,
+    borderRadius: radii.md,
+    backgroundColor: colors.primary + '33',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyIconBar: {
+    width: 18,
+    height: 3,
+    backgroundColor: colors.primary,
+    borderRadius: 2,
+    marginVertical: 2,
+  },
+  emptyTitle: {
+    ...type.h2,
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: spacing[2],
+  },
+  emptyText: {
+    ...type.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 23,
+  },
+
+  // ── FAB ──────────────────────────────────────────────────
+  fab: {
+    position: 'absolute',
+    width: 56,
+    height: 56,
+    borderRadius: radii.full,
+    backgroundColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.lg,
   },
   fabPlus: {
-    color: '#fff',
-    fontSize: 34,
+    fontSize: 30,
     fontWeight: '300',
+    color: '#fff',
+    lineHeight: 34,
     marginTop: -2,
-    lineHeight: 38,
+  },
+
+  // ── Misc ─────────────────────────────────────────────────
+  footer: {
+    ...type.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+    paddingVertical: spacing[5],
+    opacity: 0.55,
+  },
+  mockHint: {
+    ...type.caption,
+    color: colors.warning,
+    backgroundColor: colors.warningBg,
+    paddingVertical: 4,
+    textAlign: 'center',
   },
 });

@@ -1,11 +1,10 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.bg,
   },
   kav: {
     flex: 1,
@@ -15,98 +14,142 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'stretch',
     width: '100%',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 36,
+    paddingHorizontal: spacing[4],
+    paddingTop: spacing[4],
+    paddingBottom: spacing[8],
   },
   inner: {
     width: '100%',
     maxWidth: 440,
     alignSelf: 'center',
   },
-  logoSpacer: {
-    marginBottom: 12,
+
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.xl,
+    padding: spacing[5],
+    marginBottom: spacing[3],
+    ...shadows.sm,
   },
-  title: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 4,
-    letterSpacing: 1,
-    paddingHorizontal: 8,
+  cardTitle: {
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[4],
   },
-  subtitle: {
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.92)',
-    textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 20,
-    fontWeight: '500',
-    paddingHorizontal: 8,
-  },
+
   sectionLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.95)',
-    textAlign: 'center',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    marginBottom: 12,
-    marginTop: 8,
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[3],
+    marginTop: spacing[2],
   },
   hint: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.72)',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 16,
-    paddingHorizontal: 8,
-    fontStyle: 'italic',
+    ...type.caption,
+    color: colors.textMuted,
+    marginBottom: spacing[3],
+    lineHeight: 17,
+    fontWeight: '400',
   },
-  errorRoot: {
-    color: '#7f1d1d',
-    fontSize: 14,
-    marginBottom: 14,
+
+  membroBlock: {
+    marginBottom: spacing[3],
+  },
+  addMembro: {
+    ...type.body,
+    fontWeight: '700',
+    color: colors.primary,
     textAlign: 'center',
-    fontWeight: '600',
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    marginBottom: spacing[2],
+  },
+  removeMembro: {
+    ...type.caption,
+    fontWeight: '700',
+    color: colors.error,
+    textAlign: 'right',
+    marginTop: 4,
+  },
+
+  errorRoot: {
+    ...type.caption,
+    color: colors.error,
+    backgroundColor: colors.errorBg,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radii.sm,
+    marginBottom: spacing[3],
+    textAlign: 'center',
+    fontWeight: '600',
     overflow: 'hidden',
   },
   btnWrap: {
-    marginTop: 12,
+    marginTop: spacing[3],
+  },
+
+  imagemWrap: {
     width: '100%',
-    marginBottom: 8,
+    aspectRatio: 16 / 9,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
+    backgroundColor: colors.bgAlt,
+    marginBottom: spacing[3],
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    textAlign: 'center',
-    marginTop: 20,
-    paddingHorizontal: 16,
-    alignSelf: 'center',
+  imagemPreview: {
     width: '100%',
-    maxWidth: 440,
+    height: '100%',
   },
-  membroBlock: {
-    marginBottom: 12,
+  imagemPlaceholder: {
+    alignItems: 'center',
+    gap: spacing[2],
   },
-  addMembro: {
-    fontSize: 14,
-    fontWeight: '700',
+  imagemPlaceholderIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radii.full,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imagemPlaceholderIconText: {
+    fontSize: 20,
+  },
+  imagemPlaceholderText: {
+    ...type.caption,
+    color: colors.textMuted,
+  },
+  imagemAcoes: {
+    flexDirection: 'row',
+    gap: spacing[2],
+  },
+  imagemBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: radii.md,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+  },
+  imagemBtnRemover: {
+    backgroundColor: colors.bgAlt,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  imagemBtnText: {
+    ...type.label,
     color: '#fff',
-    textAlign: 'center',
-    marginBottom: 8,
-    textDecorationLine: 'underline',
   },
-  removeMembro: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(127,29,29,0.95)',
-    textAlign: 'right',
-    marginTop: 4,
+  imagemBtnRemoverText: {
+    ...type.label,
+    color: colors.textMuted,
+  },
+
+  footer: {
+    ...type.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing[5],
+    opacity: 0.5,
   },
 });

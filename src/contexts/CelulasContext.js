@@ -4,6 +4,8 @@ import { isAppwriteDatabaseConfigured } from '../lib/appwrite';
 import {
   listAllCelulasAppwrite,
   listCelulasAppwrite,
+  listCelulasByIdsAppwrite,
+  listMembrosByEmailAppwrite,
   createCelulaAppwrite,
   listMembrosByCelulaAppwrite,
   createMembroAppwrite,
@@ -14,7 +16,7 @@ import {
 const CelulasContext = createContext(null);
 
 export function CelulasProvider({ children }) {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isMembro } = useAuth();
   const [celulas, setCelulas] = useState([]);
   const [membros, setMembros] = useState([]);
   const [reunioes, setReunioes] = useState([]);
@@ -29,14 +31,22 @@ export function CelulasProvider({ children }) {
     }
     if (!isAppwriteDatabaseConfigured()) return;
     setLoadingCelulas(true);
-    const fetch = isAdmin
-      ? listAllCelulasAppwrite()
-      : listCelulasAppwrite(user.id);
-    fetch
+    let fetchPromise;
+    if (isAdmin) {
+      fetchPromise = listAllCelulasAppwrite();
+    } else if (isMembro && user.email) {
+      fetchPromise = listMembrosByEmailAppwrite(user.email).then((membros) => {
+        const ids = [...new Set(membros.map((m) => m.celulaId).filter(Boolean))];
+        return ids.length ? listCelulasByIdsAppwrite(ids) : [];
+      });
+    } else {
+      fetchPromise = listCelulasAppwrite(user.id);
+    }
+    fetchPromise
       .then(setCelulas)
       .catch(() => setCelulas([]))
       .finally(() => setLoadingCelulas(false));
-  }, [user?.id, isAdmin]);
+  }, [user?.id, user?.email, isAdmin, isMembro]);
 
   const fetchMembrosForCelula = useCallback(async (celulaId) => {
     if (!isAppwriteDatabaseConfigured() || !celulaId) return;
@@ -68,6 +78,7 @@ export function CelulasProvider({ children }) {
         dia: celula.dia ?? '',
         horario: celula.horario ?? '',
         local: celula.local ?? '',
+        imagemUrl: celula.imagemUrl ?? '',
         endereco: celula.endereco ?? '',
         celulaRaiz: celula.celulaRaiz ?? '',
         temaMinistrado: celula.temaMinistrado ?? '',

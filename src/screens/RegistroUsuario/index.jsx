@@ -31,6 +31,10 @@ export default function RegistroUsuario() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <StatusBar style="light" />
+
+      <View style={styles.bgCircle1} pointerEvents="none" />
+      <View style={styles.bgCircle2} pointerEvents="none" />
+
       <KeyboardAvoidingView
         style={styles.kav}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -44,155 +48,164 @@ export default function RegistroUsuario() {
           bounces
         >
           <View style={styles.inner}>
-            <AuthLogo style={styles.logoSpacer} />
-            <Text style={styles.title}>CRIAR CONTA</Text>
-            <Text style={styles.subtitle}>
-              Preencha seus dados para se cadastrar
-            </Text>
-
-            <Text style={styles.roleSectionLabel}>Seu perfil no app</Text>
-            <View style={styles.roleRow}>
-              <TouchableOpacity
-                style={[styles.roleBtn, permissao === 'lider' && styles.roleBtnActive]}
-                onPress={() => setPermissao('lider')}
-                activeOpacity={0.8}
-                accessibilityRole="radio"
-                accessibilityLabel="Líder"
-                accessibilityState={{ selected: permissao === 'lider' }}
-              >
-                <Text style={[styles.roleBtnLabel, permissao === 'lider' && styles.roleBtnLabelActive]}>
-                  Líder
-                </Text>
-                <Text style={[styles.roleBtnDesc, permissao === 'lider' && styles.roleBtnDescActive]}>
-                  Gerencia células
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.roleBtn, permissao === 'membro' && styles.roleBtnActive]}
-                onPress={() => setPermissao('membro')}
-                activeOpacity={0.8}
-                accessibilityRole="radio"
-                accessibilityLabel="Membro"
-                accessibilityState={{ selected: permissao === 'membro' }}
-              >
-                <Text style={[styles.roleBtnLabel, permissao === 'membro' && styles.roleBtnLabelActive]}>
-                  Membro
-                </Text>
-                <Text style={[styles.roleBtnDesc, permissao === 'membro' && styles.roleBtnDescActive]}>
-                  Participa de células
-                </Text>
-              </TouchableOpacity>
+            {/* Logo */}
+            <View style={styles.logoWrap}>
+              <AuthLogo style={styles.logoSpacer} />
+              <Text style={styles.tagline}>Gestão de Células</Text>
             </View>
 
-            <Controller
-              control={control}
-              name="nomeCompleto"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Nome completo"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.nomeCompleto?.message}
-                  autoComplete="name"
-                  textContentType="name"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="dataNascimento"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Data de nascimento (AAAA-MM-DD)"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.dataNascimento?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="endereco"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Endereço (rua, número, bairro, cidade)"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.endereco?.message}
-                  textContentType="fullStreetAddress"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Email"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.email?.message}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  textContentType="emailAddress"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="senha"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Senha"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.senha?.message}
-                  secureTextEntry
-                  autoComplete="password-new"
-                  textContentType="newPassword"
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="confirmarSenha"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  variant="auth"
-                  placeholder="Confirmar senha"
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.confirmarSenha?.message}
-                  secureTextEntry
-                  autoComplete="password-new"
-                  textContentType="newPassword"
-                />
-              )}
-            />
+            {/* Card do formulário */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Criar conta</Text>
+              <Text style={styles.cardSubtitle}>
+                Preencha seus dados para se cadastrar
+              </Text>
 
-            {errors.root?.message ? (
-              <Text style={styles.errorRoot}>{errors.root.message}</Text>
-            ) : null}
+              {/* Seletor de perfil */}
+              <Text style={styles.roleSectionLabel}>Seu perfil no app</Text>
+              <View style={styles.roleRow}>
+                <TouchableOpacity
+                  style={[styles.roleBtn, permissao === 'lider' && styles.roleBtnActive]}
+                  onPress={() => setPermissao('lider')}
+                  activeOpacity={0.8}
+                  accessibilityRole="radio"
+                  accessibilityLabel="Líder"
+                  accessibilityState={{ selected: permissao === 'lider' }}
+                >
+                  <Text style={[styles.roleBtnLabel, permissao === 'lider' && styles.roleBtnLabelActive]}>
+                    Líder
+                  </Text>
+                  <Text style={[styles.roleBtnDesc, permissao === 'lider' && styles.roleBtnDescActive]}>
+                    Gerencia células
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.roleBtn, permissao === 'membro' && styles.roleBtnActive]}
+                  onPress={() => setPermissao('membro')}
+                  activeOpacity={0.8}
+                  accessibilityRole="radio"
+                  accessibilityLabel="Membro"
+                  accessibilityState={{ selected: permissao === 'membro' }}
+                >
+                  <Text style={[styles.roleBtnLabel, permissao === 'membro' && styles.roleBtnLabelActive]}>
+                    Membro
+                  </Text>
+                  <Text style={[styles.roleBtnDesc, permissao === 'membro' && styles.roleBtnDescActive]}>
+                    Participa de células
+                  </Text>
+                </TouchableOpacity>
+              </View>
 
-            <View style={styles.btnWrap}>
-              <Button
-                variant="accent"
-                title="CADASTRAR"
-                onPress={handleSubmit(onSubmit)}
-                loading={loading}
+              <Controller
+                control={control}
+                name="nomeCompleto"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Nome completo"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.nomeCompleto?.message}
+                    autoComplete="name"
+                    textContentType="name"
+                  />
+                )}
               />
+              <Controller
+                control={control}
+                name="dataNascimento"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Data de nascimento (DD/MM/AAAA)"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.dataNascimento?.message}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="endereco"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Endereço (rua, número, bairro, cidade)"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.endereco?.message}
+                    textContentType="fullStreetAddress"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Email"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.email?.message}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="senha"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Senha"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.senha?.message}
+                    secureTextEntry
+                    autoComplete="password-new"
+                    textContentType="newPassword"
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="confirmarSenha"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    variant="auth"
+                    placeholder="Confirmar senha"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    error={errors.confirmarSenha?.message}
+                    secureTextEntry
+                    autoComplete="password-new"
+                    textContentType="newPassword"
+                  />
+                )}
+              />
+
+              {errors.root?.message ? (
+                <Text style={styles.errorRoot}>{errors.root.message}</Text>
+              ) : null}
+
+              <View style={styles.btnWrap}>
+                <Button
+                  variant="accent"
+                  title="CADASTRAR"
+                  onPress={handleSubmit(onSubmit)}
+                  loading={loading}
+                />
+              </View>
             </View>
 
             <TouchableOpacity
@@ -205,7 +218,7 @@ export default function RegistroUsuario() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

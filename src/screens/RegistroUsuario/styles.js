@@ -1,11 +1,10 @@
 import { StyleSheet } from 'react-native';
-
-export const BG = '#CDAA6D';
+import { colors, radii, shadows, spacing, type } from '../../theme';
 
 export const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: colors.primaryDark,
   },
   kav: {
     flex: 1,
@@ -15,119 +14,154 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'stretch',
     width: '100%',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 36,
+    paddingHorizontal: spacing[4],
+    paddingTop: spacing[5],
+    paddingBottom: spacing[8],
   },
+
+  bgCircle1: {
+    position: 'absolute',
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: 'rgba(201,162,39,0.06)',
+    top: -60,
+    right: -50,
+  },
+  bgCircle2: {
+    position: 'absolute',
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    bottom: 60,
+    left: -40,
+  },
+
   inner: {
     width: '100%',
     maxWidth: 440,
     alignSelf: 'center',
   },
-  subtitle: {
-    fontSize: 15,
-    color: 'rgba(255,255,255,0.92)',
-    textAlign: 'center',
-    marginTop: 4,
-    marginBottom: 22,
-    fontWeight: '500',
-    paddingHorizontal: 8,
+  logoWrap: {
+    alignItems: 'center',
+    marginBottom: spacing[6],
   },
+  logoSpacer: {
+    marginBottom: 0,
+  },
+  tagline: {
+    ...type.caption,
+    color: 'rgba(255,255,255,0.45)',
+    textAlign: 'center',
+    letterSpacing: 1.2,
+    marginTop: spacing[2],
+    textTransform: 'uppercase',
+  },
+
+  // Card branco
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.xl,
+    padding: spacing[5],
+    ...shadows.lg,
+  },
+  cardTitle: {
+    ...type.h3,
+    color: colors.text,
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    ...type.bodySm,
+    color: colors.textSecondary,
+    marginBottom: spacing[4],
+  },
+
+  // Seletor de perfil (dentro do card)
   roleSectionLabel: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    fontWeight: '700',
-    marginBottom: 8,
-    paddingHorizontal: 2,
-    letterSpacing: 0.3,
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[2],
   },
   roleRow: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 20,
+    marginBottom: spacing[4],
   },
   roleBtn: {
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 8,
-    borderRadius: 10,
+    borderRadius: radii.md,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.35)',
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.bgAlt,
   },
   roleBtnActive: {
-    borderColor: '#fff',
-    backgroundColor: 'rgba(255,255,255,0.28)',
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
   },
   roleBtnLabel: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 0.2,
+    ...type.h4,
+    color: colors.textMuted,
   },
   roleBtnLabelActive: {
-    color: '#fff',
+    color: colors.primary,
   },
   roleBtnDesc: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.5)',
+    ...type.caption,
+    color: colors.textMuted,
     marginTop: 2,
+    fontWeight: '400',
   },
   roleBtnDescActive: {
-    color: 'rgba(255,255,255,0.85)',
+    color: colors.textSecondary,
   },
-  title: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 4,
-    letterSpacing: 1,
-    paddingHorizontal: 8,
-  },
+
   errorRoot: {
-    color: '#7f1d1d',
-    fontSize: 14,
-    marginBottom: 14,
-    textAlign: 'center',
-    fontWeight: '600',
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    ...type.caption,
+    color: colors.error,
+    backgroundColor: colors.errorBg,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: radii.sm,
+    marginBottom: spacing[3],
+    textAlign: 'center',
+    fontWeight: '600',
     overflow: 'hidden',
   },
+  btnWrap: {
+    marginTop: spacing[3],
+  },
+
   link: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginTop: 22,
+    marginTop: spacing[5],
     paddingHorizontal: 4,
   },
-  linkText: { fontSize: 15, color: 'rgba(255,255,255,0.95)' },
+  linkText: {
+    ...type.body,
+    color: 'rgba(255,255,255,0.6)',
+  },
   linkBold: {
-    fontSize: 15,
+    ...type.body,
     fontWeight: '800',
-    color: '#fff',
+    color: colors.accentAlt,
     letterSpacing: 0.5,
   },
-  btnWrap: {
-    marginTop: 12,
-    width: '100%',
-  },
+
   footer: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
+    ...type.caption,
+    color: 'rgba(255,255,255,0.3)',
     textAlign: 'center',
-    marginTop: 24,
-    paddingHorizontal: 16,
+    marginTop: spacing[6],
+    paddingHorizontal: spacing[4],
     alignSelf: 'center',
     width: '100%',
     maxWidth: 440,
-  },
-  logoSpacer: {
-    marginBottom: 12,
   },
 });

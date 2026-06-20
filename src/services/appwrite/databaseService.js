@@ -76,6 +76,7 @@ export async function createCelulaAppwrite(userId, celula) {
       endereco: celula.endereco ?? '',
       dia: celula.dia ?? '',
       horario: celula.horario ?? '',
+      imagemUrl: celula.imagemUrl ?? '',
       celulaRaiz: celula.celulaRaiz ?? '',
       temaMinistrado: celula.temaMinistrado ?? '',
       textoBase: celula.textoBase ?? '',
@@ -136,6 +137,39 @@ export async function createReuniaoAppwrite(celulaId, dados) {
     await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, basePayload);
   }
   return docId;
+}
+
+export async function getUserByEmailAppwrite(email) {
+  if (!ensureConfig() || !email) return null;
+  const d = db();
+  if (!d) return null;
+  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.usuarios, [
+    Query.equal('email', [email.toLowerCase().trim()]),
+    Query.limit(1),
+  ]);
+  const doc = (res.documents || [])[0];
+  return doc ? normalizeDocument(doc) : null;
+}
+
+export async function listMembrosByEmailAppwrite(email) {
+  if (!ensureConfig() || !email) return [];
+  const d = db();
+  if (!d) return [];
+  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.membros, [
+    Query.equal('email', [email]),
+  ]);
+  return (res.documents || []).map(normalizeDocument);
+}
+
+export async function listCelulasByIdsAppwrite(ids) {
+  if (!ensureConfig() || !ids?.length) return [];
+  const d = db();
+  if (!d) return [];
+  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.celulas, [
+    Query.equal('$id', ids),
+    Query.orderDesc('$createdAt'),
+  ]);
+  return (res.documents || []).map(normalizeDocument);
 }
 
 /**

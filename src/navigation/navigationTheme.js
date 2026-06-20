@@ -1,7 +1,6 @@
-/** Cabeçalhos e tema dourado compartilhados entre stacks */
 export const GOLD_HEADER = {
-  headerStyle: { backgroundColor: '#CDAA6D' },
+  headerStyle: { backgroundColor: '#1A3A6B' },
   headerTintColor: '#fff',
   headerShadowVisible: false,
-  headerTitleStyle: { fontWeight: '700', color: '#fff' },
+  headerTitleStyle: { fontSize: 17, fontWeight: '700', color: '#fff', letterSpacing: -0.2 },
 };

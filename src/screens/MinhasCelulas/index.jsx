@@ -25,15 +25,11 @@ function ScreenHeader({ onOpenMenu }) {
         accessibilityRole="button"
         accessibilityLabel="Abrir menu"
       >
-        <View>
-          <View style={styles.menuBar} />
-          <View style={styles.menuBar} />
-          <View style={[styles.menuBar, styles.menuBarLast]} />
-        </View>
+        <View style={styles.menuBar} />
+        <View style={styles.menuBar} />
+        <View style={[styles.menuBar, styles.menuBarLast]} />
       </TouchableOpacity>
-      <Text style={styles.headerTitle} numberOfLines={1}>
-        Minhas Células
-      </Text>
+      <Text style={styles.headerTitle}>Minhas Células</Text>
       <Image
         source={LOGO_HEADER}
         style={styles.headerLogo}
@@ -44,12 +40,26 @@ function ScreenHeader({ onOpenMenu }) {
   );
 }
 
-function ImagePlaceholder() {
+function CardPlaceholder() {
   return (
     <View style={styles.placeholderInner}>
-      <View style={styles.placeholderRow}>
-        <View style={styles.placeholderSun} />
-        <View style={styles.placeholderMountain} />
+      <View style={styles.placeholderCircle1} />
+      <View style={styles.placeholderCircle2} />
+      <View style={styles.placeholderIcon}>
+        <View style={styles.placeholderRoof} />
+        <View style={styles.placeholderBody} />
+      </View>
+    </View>
+  );
+}
+
+function SkeletonCard({ width }) {
+  return (
+    <View style={[styles.skeletonCard, { width }]}>
+      <View style={styles.skeletonImage} />
+      <View style={styles.skeletonBody}>
+        <View style={styles.skeletonLine} />
+        <View style={[styles.skeletonLine, { width: '65%' }]} />
       </View>
     </View>
   );
@@ -59,6 +69,7 @@ export default function MinhasCelulas() {
   const {
     celulas,
     canManage,
+    loadingCelulas,
     usandoMockLista,
     handleCadastrar,
     openDrawer,
@@ -71,7 +82,6 @@ export default function MinhasCelulas() {
   const PAD = 16;
   const GAP = 12;
   const cardWidth = (width - PAD * 2 - GAP) / 2;
-
   const fabBottom = 20 + Math.max(insets.bottom, 8);
 
   const renderCelula = useCallback(
@@ -79,7 +89,7 @@ export default function MinhasCelulas() {
       <TouchableOpacity
         style={[styles.card, { width: cardWidth }]}
         onPress={() => openDetalheCelula(item)}
-        activeOpacity={0.9}
+        activeOpacity={0.88}
       >
         <View style={styles.cardImageWrap}>
           {item.imagemUrl ? (
@@ -89,43 +99,55 @@ export default function MinhasCelulas() {
               resizeMode="cover"
             />
           ) : (
-            <ImagePlaceholder />
+            <CardPlaceholder />
           )}
         </View>
         <View style={styles.cardBody}>
           <Text style={styles.cardNome} numberOfLines={2}>
             {item.nomeCelula}
           </Text>
-          <Text style={styles.cardDia} numberOfLines={2}>
-            {item.dia}
-          </Text>
-          <Text style={styles.cardHorario} numberOfLines={1}>
-            {item.horario}
-          </Text>
+          <View style={styles.cardMeta}>
+            <Text style={styles.cardMetaText} numberOfLines={1}>
+              {[item.dia, item.horario].filter(Boolean).join('  ·  ')}
+            </Text>
+          </View>
         </View>
+        <View style={styles.cardAccentBar} />
       </TouchableOpacity>
     ),
     [cardWidth, openDetalheCelula],
   );
 
   const ListFooter = useCallback(
-    () => (
-      <Text style={styles.footer}>Powered by Camila Guimaraes</Text>
-    ),
+    () => <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>,
     [],
   );
 
-  const renderFab = () => (
-    <TouchableOpacity
-      style={[styles.fab, { right: 20, bottom: fabBottom }]}
-      onPress={handleCadastrar}
-      activeOpacity={0.9}
-      accessibilityRole="button"
-      accessibilityLabel="Cadastrar nova célula"
-    >
-      <Text style={styles.fabPlus}>+</Text>
-    </TouchableOpacity>
-  );
+  const renderFab = () =>
+    canManage ? (
+      <TouchableOpacity
+        style={[styles.fab, { right: 20, bottom: fabBottom }]}
+        onPress={handleCadastrar}
+        activeOpacity={0.88}
+        accessibilityRole="button"
+        accessibilityLabel="Cadastrar nova célula"
+      >
+        <Text style={styles.fabPlus}>+</Text>
+      </TouchableOpacity>
+    ) : null;
+
+  if (loadingCelulas) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <StatusBar style="light" />
+        <ScreenHeader onOpenMenu={openDrawer} />
+        <View style={styles.skeletonGrid}>
+          <SkeletonCard width={cardWidth} />
+          <SkeletonCard width={cardWidth} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (celulas.length === 0) {
     return (
@@ -138,20 +160,24 @@ export default function MinhasCelulas() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.emptyTitle}>Nenhuma célula cadastrada</Text>
-          {canManage ? (
-            <Text style={styles.emptyText}>
-              Use o botão + para registrar sua primeira célula.
-            </Text>
-          ) : (
-            <Text style={styles.emptyText}>
-              Você ainda não está vinculado a nenhuma célula. Entre em contato
-              com um líder para ser adicionado.
-            </Text>
-          )}
+          <View style={styles.emptyIconWrap}>
+            <View style={styles.emptyIconInner}>
+              <View style={styles.emptyIconBar} />
+              <View style={styles.emptyIconBar} />
+              <View style={[styles.emptyIconBar, { width: 10 }]} />
+            </View>
+          </View>
+          <Text style={styles.emptyTitle}>
+            {canManage ? 'Nenhuma célula ainda' : 'Sem células vinculadas'}
+          </Text>
+          <Text style={styles.emptyText}>
+            {canManage
+              ? 'Toque no botão + para registrar sua primeira célula.'
+              : 'Você ainda não está vinculado a nenhuma célula. Entre em contato com um líder.'}
+          </Text>
           <ListFooter />
         </ScrollView>
-        {canManage ? renderFab() : null}
+        {renderFab()}
       </SafeAreaView>
     );
   }
@@ -161,9 +187,7 @@ export default function MinhasCelulas() {
       <StatusBar style="light" />
       <ScreenHeader onOpenMenu={openDrawer} />
       {__DEV__ && usandoMockLista ? (
-        <Text style={[styles.mockHint, { paddingHorizontal: 16, paddingBottom: 6 }]}>
-          Lista de teste — mockFlags.js (USE_CELULAS_LIST_MOCK)
-        </Text>
+        <Text style={styles.mockHint}>Lista de teste (USE_CELULAS_LIST_MOCK)</Text>
       ) : null}
       <FlatList
         style={styles.listFlex}
@@ -177,7 +201,7 @@ export default function MinhasCelulas() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       />
-      {canManage ? renderFab() : null}
+      {renderFab()}
     </SafeAreaView>
   );
 }
