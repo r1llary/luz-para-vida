@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,7 +10,7 @@ const ROLE_COLOR = { lider: colors.accent, admin: '#7C3AED', membro: '#64748B' }
 
 export function CustomDrawerContent({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { user, signOut, canManage } = useAuth();
+  const { user, signOut, canManage, isAdmin } = useAuth();
 
   const go = (tab, screen, params) => {
     navigation.closeDrawer();
@@ -27,7 +27,15 @@ export function CustomDrawerContent({ navigation }) {
       {/* ── Cabeçalho do usuário ── */}
       <View style={styles.userSection}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initials(user?.nomeCompleto)}</Text>
+          {user?.fotoPerfilUrl ? (
+            <Image
+              source={{ uri: String(user.fotoPerfilUrl) }}
+              style={styles.avatarImg}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={styles.avatarText}>{initials(user?.nomeCompleto)}</Text>
+          )}
         </View>
         <View style={styles.userInfo}>
           <Text style={styles.userName} numberOfLines={1}>
@@ -59,6 +67,13 @@ export function CustomDrawerContent({ navigation }) {
         <NavItem icon="grid-outline" label="Minhas Células" onPress={() => go('CelulasTab', 'MinhasCelulas')} />
         {canManage && (
           <NavItem icon="add-circle-outline" label="Nova Célula" onPress={() => go('CelulasTab', 'RegistroCelula')} accent />
+        )}
+
+        {isAdmin && (
+          <>
+            <SectionLabel label="Administração" />
+            <NavItem icon="people-outline" label="Gerenciar Usuários" onPress={() => go('CelulasTab', 'GerenciarUsuarios')} />
+          </>
         )}
 
         <SectionLabel label="Relatórios" />
@@ -119,6 +134,11 @@ const styles = StyleSheet.create({
     borderColor: colors.accent + '60',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  avatarImg: {
+    width: '100%',
+    height: '100%',
+    borderRadius: radii.full,
   },
   avatarText: {
     ...type.h4,

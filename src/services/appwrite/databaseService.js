@@ -101,12 +101,16 @@ export async function listReunioesByCelulaAppwrite(celulaId) {
       Query.orderDesc('dataReuniao'),
     ]);
     return (res.documents || []).map(mapReuniaoDocument);
-  } catch (_) {
-    const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.relatorios, [
-      Query.equal('celulaId', [celulaId]),
-      Query.orderDesc('$createdAt'),
-    ]);
-    return (res.documents || []).map(mapReuniaoDocument);
+  } catch (originalError) {
+    try {
+      const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.relatorios, [
+        Query.equal('celulaId', [celulaId]),
+        Query.orderDesc('$createdAt'),
+      ]);
+      return (res.documents || []).map(mapReuniaoDocument);
+    } catch (retryError) {
+      throw originalError;
+    }
   }
 }
 
@@ -137,6 +141,51 @@ export async function createReuniaoAppwrite(celulaId, dados) {
     await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, basePayload);
   }
   return docId;
+}
+
+export async function updateReuniaoAppwrite(reuniaoId, dados) {
+  if (!ensureConfig() || !reuniaoId) return false;
+  const d = db();
+  if (!d) return false;
+  const ids = Array.isArray(dados.membrosPresentesIds)
+    ? dados.membrosPresentesIds.filter(Boolean)
+    : [];
+  const membrosCount = ids.length > 0 ? ids.length : Number(dados.membrosPresentes) || 0;
+  const basePayload = {
+    dataReuniao: dados.dataReuniao ?? '',
+    temaMinistrado: dados.temaMinistrado ?? '',
+    textoBase: dados.textoBase ?? '',
+    visitantes: Number(dados.visitantes) || 0,
+    membrosPresentes: membrosCount,
+  };
+  try {
+    await d.updateDocument(DATABASE_ID, COLLECTION_IDS.relatorios, reuniaoId, {
+      ...basePayload,
+      membrosPresentesIds: JSON.stringify(ids),
+    });
+  } catch (_) {
+    await d.updateDocument(DATABASE_ID, COLLECTION_IDS.relatorios, reuniaoId, basePayload);
+  }
+  return true;
+}
+
+export async function listAllUsersAppwrite() {
+  if (!ensureConfig()) return [];
+  const d = db();
+  if (!d) return [];
+  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.usuarios, [
+    Query.orderDesc('$createdAt'),
+    Query.limit(100),
+  ]);
+  return (res.documents || []).map(normalizeDocument);
+}
+
+export async function updateUserPermissaoAppwrite(userId, permissao) {
+  if (!ensureConfig() || !userId) return false;
+  const d = db();
+  if (!d) return false;
+  await d.updateDocument(DATABASE_ID, COLLECTION_IDS.usuarios, userId, { permissao });
+  return true;
 }
 
 export async function getUserByEmailAppwrite(email) {

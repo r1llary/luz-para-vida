@@ -32,11 +32,16 @@ export default function EditarPerfil() {
     clearFotoEscolha,
   } = useEditarPerfilScreen();
 
+
   const previewUri =
     fotoUri ||
     (!removeFoto && user?.fotoPerfilUrl ? String(user.fotoPerfilUrl) : null);
 
   const temFotoVisivel = !!(fotoUri || (!removeFoto && user?.fotoPerfilUrl));
+
+  function iniciais(nome = '') {
+    return nome.trim().split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
+  }
 
   if (!user) {
     return (
@@ -71,7 +76,9 @@ export default function EditarPerfil() {
                   {temFotoVisivel && previewUri ? (
                     <Image source={{ uri: previewUri }} style={styles.fotoPreview} />
                   ) : (
-                    <View style={[styles.fotoPreview, { opacity: 0.4 }]} />
+                    <View style={[styles.fotoPreview, styles.fotoPreviewPlaceholder]}>
+                      <Text style={styles.fotoPreviewIniciais}>{iniciais(user?.nomeCompleto)}</Text>
+                    </View>
                   )}
                   <View style={styles.fotoActions}>
                     <TouchableOpacity style={styles.fotoBtn} onPress={pickFoto}>

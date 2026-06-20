@@ -1,14 +1,13 @@
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { registroUsuarioSchema } from '../../schemas';
 import { useAuth } from '../../contexts/AuthContext';
+import { CODIGO_LIDER } from '../../config/accessCodes';
 
 export function useRegistroUsuarioScreen() {
   const navigation = useNavigation();
   const { signUp, loading } = useAuth();
-  const [permissao, setPermissao] = useState('membro');
 
   const {
     control,
@@ -24,11 +23,12 @@ export function useRegistroUsuarioScreen() {
       email: '',
       senha: '',
       confirmarSenha: '',
-      permissao: 'membro',
+      codigoAcesso: '',
     },
   });
 
   const onSubmit = async (data) => {
+    const permissao = data.codigoAcesso?.trim() === CODIGO_LIDER ? 'lider' : 'membro';
     const result = await signUp({
       nomeCompleto: data.nomeCompleto,
       email: data.email,
@@ -51,7 +51,5 @@ export function useRegistroUsuarioScreen() {
     onSubmit,
     loading,
     goToLogin,
-    permissao,
-    setPermissao,
   };
 }

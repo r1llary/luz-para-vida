@@ -12,10 +12,10 @@ import { StatusBar } from 'expo-status-bar';
 import { Controller } from 'react-hook-form';
 import { Input } from '../../components/Inputs';
 import { Button } from '../../components/Buttons';
-import { styles } from './styles';
-import { useNovaReuniaoScreen } from './useNovaReuniaoScreen';
+import { styles } from '../NovaReuniao/styles';
+import { useEditarReuniaoScreen } from './useEditarReuniaoScreen';
 
-export default function NovaReuniao() {
+export default function EditarReuniao() {
   const {
     celula,
     membros,
@@ -24,7 +24,7 @@ export default function NovaReuniao() {
     errors,
     onSubmit,
     submitting,
-  } = useNovaReuniaoScreen();
+  } = useEditarReuniaoScreen();
 
   if (!celula) {
     return (
@@ -55,7 +55,7 @@ export default function NovaReuniao() {
         >
           <View style={styles.inner}>
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Dados da reunião — {celula.nomeCelula}</Text>
+              <Text style={styles.cardTitle}>Editar reunião — {celula.nomeCelula}</Text>
 
               <Controller
                 control={control}
@@ -174,10 +174,6 @@ export default function NovaReuniao() {
                 <Text style={styles.errorField}>{errors.membrosPresentesIds.message}</Text>
               ) : null}
 
-              <Text style={styles.hint}>
-                Use a data como identificador da reunião na lista da célula.
-              </Text>
-
               {errors.root?.message ? (
                 <Text style={styles.errorRoot}>{errors.root.message}</Text>
               ) : null}
@@ -185,7 +181,7 @@ export default function NovaReuniao() {
               <View style={styles.btnWrap}>
                 <Button
                   variant="accent"
-                  title="REGISTRAR REUNIÃO"
+                  title="SALVAR ALTERAÇÕES"
                   onPress={handleSubmit(onSubmit)}
                   loading={submitting}
                 />

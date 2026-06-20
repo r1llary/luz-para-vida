@@ -6,6 +6,8 @@ import DetalheCelula from '../screens/DetalheCelula';
 import RegistroMembro from '../screens/RegistroMembro';
 import NovaReuniao from '../screens/NovaReuniao';
 import DetalheReuniao from '../screens/DetalheReuniao';
+import EditarReuniao from '../screens/EditarReuniao';
+import GerenciarUsuarios from '../screens/GerenciarUsuarios';
 import { GOLD_HEADER } from './navigationTheme';
 
 const Stack = createNativeStackNavigator();
@@ -23,6 +25,8 @@ export function CelulasStack() {
       <Stack.Screen name="RegistroMembro" component={RegistroMembro} options={{ title: 'Novo membro' }} />
       <Stack.Screen name="NovaReuniao" component={NovaReuniao} options={{ title: 'Nova reunião' }} />
       <Stack.Screen name="DetalheReuniao" component={DetalheReuniao} options={{ title: 'Reunião' }} />
+      <Stack.Screen name="EditarReuniao" component={EditarReuniao} options={{ title: 'Editar reunião' }} />
+      <Stack.Screen name="GerenciarUsuarios" component={GerenciarUsuarios} options={{ title: 'Usuários' }} />
     </Stack.Navigator>
   );
 }

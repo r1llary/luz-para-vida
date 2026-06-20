@@ -1,4 +1,6 @@
 import { ID } from 'appwrite';
+import { Platform } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import {
   isAppwriteConfigured,
   getAppwriteAccount,
@@ -12,7 +14,23 @@ import {
 } from '../../lib/appwrite';
 import { uploadAvatarFromUri } from './storageAvatar';
 
+const SESSION_STORAGE_KEY = 'lpv_appwrite_session';
+
 const PERMISSOES = ['membro', 'admin', 'lider'];
+
+async function saveSessionToNative(secret) {
+  if (!secret || Platform.OS === 'web') return;
+  try {
+    await SecureStore.setItemAsync(SESSION_STORAGE_KEY, secret);
+  } catch (_) { /* noop */ }
+}
+
+async function clearSessionFromNative() {
+  if (Platform.OS === 'web') return;
+  try {
+    await SecureStore.deleteItemAsync(SESSION_STORAGE_KEY);
+  } catch (_) { /* noop */ }
+}
 
 function applySessionFromResponse(session) {
   const client = getAppwriteClient();
@@ -47,20 +65,25 @@ function clearCookieFallback() {
 }
 
 /**
- * Restaura X-Appwrite-Session a partir do cookieFallback (útil após reload do app / Expo).
+ * Restaura X-Appwrite-Session: usa cookieFallback no web, SecureStore no native.
  */
-export function restoreAppwriteSessionFromStorage() {
+export async function restoreAppwriteSessionFromStorage() {
   const client = getAppwriteClient();
   if (!client) return;
   if (client.config.session) return;
   try {
-    const raw =
-      typeof globalThis !== 'undefined' && globalThis.localStorage
-        ? globalThis.localStorage.getItem('cookieFallback')
-        : null;
-    if (raw) {
-      const cookie = JSON.parse(raw);
-      const sid = cookie[`a_session_${client.config.project}`];
+    if (Platform.OS === 'web') {
+      const raw =
+        typeof globalThis !== 'undefined' && globalThis.localStorage
+          ? globalThis.localStorage.getItem('cookieFallback')
+          : null;
+      if (raw) {
+        const cookie = JSON.parse(raw);
+        const sid = cookie[`a_session_${client.config.project}`];
+        if (sid) client.setSession(sid);
+      }
+    } else {
+      const sid = await SecureStore.getItemAsync(SESSION_STORAGE_KEY);
       if (sid) client.setSession(sid);
     }
   } catch (_) {
@@ -88,6 +111,7 @@ export async function signInWithAppwrite(email, senha) {
   if (!account) return null;
   const session = await account.createEmailPasswordSession(email, senha);
   applySessionFromResponse(session);
+  await saveSessionToNative(session?.secret);
   return getCurrentUserFromAppwrite();
 }
 
@@ -121,6 +145,7 @@ export async function signUpWithAppwrite(profile) {
 
   const session = await account.createEmailPasswordSession(email, senha);
   applySessionFromResponse(session);
+  await saveSessionToNative(session?.secret);
 
   let fotoPerfilId = '';
   if (fotoUri && BUCKET_AVATARS_ID) {
@@ -149,7 +174,11 @@ export async function signUpWithAppwrite(profile) {
         },
       );
     } catch (e) {
-      throw e;
+      // Conta foi criada mas o perfil falhou. O usuário pode fazer login e
+      // editar o perfil para completar o cadastro.
+      throw new Error(
+        'Conta criada, mas houve um erro ao salvar o perfil. Faça login e complete seu perfil nas configurações.',
+      );
     }
   }
 
@@ -275,6 +304,7 @@ export async function signOutFromAppwrite() {
     client.setSession('');
   }
   clearCookieFallback();
+  await clearSessionFromNative();
   resetAppwriteClients();
 }
 

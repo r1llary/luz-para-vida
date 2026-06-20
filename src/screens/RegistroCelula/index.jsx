@@ -16,6 +16,16 @@ import { Button } from '../../components/Buttons';
 import { styles } from './styles';
 import { useRegistroCelulaScreen } from './useRegistroCelulaScreen';
 
+const DIAS_SEMANA = [
+  { abrev: 'Dom', full: 'Domingo' },
+  { abrev: 'Seg', full: 'Segunda-feira' },
+  { abrev: 'Ter', full: 'Terça-feira' },
+  { abrev: 'Qua', full: 'Quarta-feira' },
+  { abrev: 'Qui', full: 'Quinta-feira' },
+  { abrev: 'Sex', full: 'Sexta-feira' },
+  { abrev: 'Sáb', full: 'Sábado' },
+];
+
 export default function RegistroCelula() {
   const {
     control,
@@ -96,15 +106,27 @@ export default function RegistroCelula() {
               <Controller
                 control={control}
                 name="dia"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    variant="auth"
-                    placeholder="Dia (ex.: Segunda-feira)"
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    error={errors.dia?.message}
-                  />
+                render={({ field: { onChange, value } }) => (
+                  <View style={styles.diasWrap}>
+                    <Text style={styles.diasLabel}>Dia da semana</Text>
+                    <View style={styles.diasRow}>
+                      {DIAS_SEMANA.map((d) => (
+                        <TouchableOpacity
+                          key={d.full}
+                          style={[styles.diaBtn, value === d.full && styles.diaBtnAtivo]}
+                          onPress={() => onChange(d.full)}
+                          activeOpacity={0.8}
+                        >
+                          <Text style={[styles.diaBtnText, value === d.full && styles.diaBtnTextoAtivo]}>
+                            {d.abrev}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                    {errors.dia?.message ? (
+                      <Text style={styles.diaError}>{errors.dia.message}</Text>
+                    ) : null}
+                  </View>
                 )}
               />
               <Controller

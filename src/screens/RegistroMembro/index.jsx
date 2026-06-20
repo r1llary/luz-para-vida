@@ -183,10 +183,14 @@ export default function RegistroMembro() {
                     variant="auth"
                     placeholder="CEP (preenche o endereço automaticamente)"
                     value={value}
-                    onChangeText={onChange}
-                    onBlur={() => { onBlur(); buscarCep(value); }}
+                    onChangeText={(v) => {
+                      onChange(v);
+                      if (v.replace(/\D/g, '').length === 8) buscarCep(v);
+                    }}
+                    onBlur={onBlur}
                     error={errors.cep?.message}
                     keyboardType="number-pad"
+                    maxLength={9}
                   />
                 )}
               />

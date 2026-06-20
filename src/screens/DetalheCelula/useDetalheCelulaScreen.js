@@ -3,13 +3,9 @@ import { DrawerActions } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCelulas } from '../../contexts/CelulasContext';
+import { formatDateBr } from '../../utils/date';
 
-export function formatDateBr(iso) {
-  if (!iso || typeof iso !== 'string') return '';
-  const [y, m, d] = iso.split('-');
-  if (!y || !m || !d) return String(iso);
-  return `${d}/${m}/${y}`;
-}
+export { formatDateBr };
 
 export function useDetalheCelulaScreen() {
   const navigation = useNavigation();

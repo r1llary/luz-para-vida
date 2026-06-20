@@ -91,6 +91,21 @@ export const styles = StyleSheet.create({
     color: colors.text,
   },
 
+  editBtn: {
+    marginTop: spacing[2],
+    paddingVertical: 13,
+    borderRadius: radii.lg,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    alignItems: 'center',
+    marginBottom: spacing[2],
+  },
+  editBtnText: {
+    ...type.label,
+    color: colors.primary,
+    letterSpacing: 0.5,
+  },
+
   empty: {
     ...type.body,
     color: colors.textMuted,

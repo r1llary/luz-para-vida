@@ -11,6 +11,7 @@ import {
   createMembroAppwrite,
   listReunioesByCelulaAppwrite,
   createReuniaoAppwrite,
+  updateReuniaoAppwrite,
 } from '../services/appwrite';
 
 const CelulasContext = createContext(null);
@@ -50,11 +51,15 @@ export function CelulasProvider({ children }) {
 
   const fetchMembrosForCelula = useCallback(async (celulaId) => {
     if (!isAppwriteDatabaseConfigured() || !celulaId) return;
-    const list = await listMembrosByCelulaAppwrite(celulaId);
-    setMembros((prev) => [
-      ...prev.filter((m) => m.celulaId !== celulaId),
-      ...list,
-    ]);
+    try {
+      const list = await listMembrosByCelulaAppwrite(celulaId);
+      setMembros((prev) => [
+        ...prev.filter((m) => m.celulaId !== celulaId),
+        ...list,
+      ]);
+    } catch (_) {
+      /* falha de rede — mantém estado atual */
+    }
   }, []);
 
   const fetchReunioesForCelula = useCallback(async (celulaId) => {
@@ -90,7 +95,9 @@ export function CelulasProvider({ children }) {
         try {
           const id = await createCelulaAppwrite(user.id, payload);
           if (id) {
-            const list = await listCelulasAppwrite(user.id);
+            const list = isAdmin
+              ? await listAllCelulasAppwrite()
+              : await listCelulasAppwrite(user.id);
             setCelulas(list);
             return id;
           }
@@ -106,7 +113,7 @@ export function CelulasProvider({ children }) {
       setCelulas((prev) => [...prev, nova]);
       return nova.id;
     },
-    [user?.id]
+    [user?.id, isAdmin]
   );
 
   const addMembro = useCallback(
@@ -175,6 +182,43 @@ export function CelulasProvider({ children }) {
     [fetchReunioesForCelula]
   );
 
+  const updateReuniao = useCallback(
+    async (reuniaoId, celulaId, dados) => {
+      if (isAppwriteDatabaseConfigured()) {
+        try {
+          const ok = await updateReuniaoAppwrite(reuniaoId, dados);
+          if (ok) {
+            await fetchReunioesForCelula(celulaId);
+            return true;
+          }
+        } catch (_) {
+          /* fallback local */
+        }
+      }
+      const ids = Array.isArray(dados.membrosPresentesIds)
+        ? dados.membrosPresentesIds.filter(Boolean)
+        : [];
+      const membrosCount = ids.length > 0 ? ids.length : 0;
+      setReunioes((prev) =>
+        prev.map((r) =>
+          r.id === reuniaoId
+            ? {
+                ...r,
+                dataReuniao: dados.dataReuniao ?? r.dataReuniao,
+                temaMinistrado: dados.temaMinistrado ?? r.temaMinistrado,
+                textoBase: dados.textoBase ?? r.textoBase,
+                visitantes: Number(dados.visitantes) || r.visitantes,
+                membrosPresentes: membrosCount,
+                membrosPresentesIds: ids,
+              }
+            : r
+        )
+      );
+      return true;
+    },
+    [fetchReunioesForCelula]
+  );
+
   const getMembrosByCelula = useCallback(
     (celulaId) => membros.filter((m) => m.celulaId === celulaId),
     [membros]
@@ -198,6 +242,7 @@ export function CelulasProvider({ children }) {
     addCelula,
     addMembro,
     addReuniao,
+    updateReuniao,
     getMembrosByCelula,
     getReunioesByCelula,
     fetchMembrosForCelula,

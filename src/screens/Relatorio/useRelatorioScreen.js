@@ -4,13 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { relatorioMensalSchema } from '../../schemas';
 import { useCelulas } from '../../contexts/CelulasContext';
+import { formatDateBr } from '../../utils/date';
 
-export function formatDateBr(iso) {
-  if (!iso || typeof iso !== 'string') return '';
-  const [y, m, d] = iso.split('-');
-  if (!y || !m || !d) return String(iso);
-  return `${d}/${m}/${y}`;
-}
+export { formatDateBr };
 
 export function useRelatorioScreen() {
   const navigation = useNavigation();

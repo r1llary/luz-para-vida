@@ -1,23 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
-
-// Converte DD/MM/AAAA → YYYY-MM-DD para armazenamento e filtros
-function toISODate(br) {
-  const match = String(br).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if (match) return `${match[3]}-${match[2]}-${match[1]}`;
-  return br;
-}
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { reuniaoSchema } from '../../schemas';
 import { useCelulas } from '../../contexts/CelulasContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { toISODate } from '../../utils/date';
 
 export function useNovaReuniaoScreen() {
   const navigation = useNavigation();
   const { params } = useRoute();
   const celula = params?.celula;
-  const { addReuniao, fetchMembrosForCelula, getMembrosByCelula } =
-    useCelulas();
+  const { addReuniao, fetchMembrosForCelula, getMembrosByCelula } = useCelulas();
+  const { canManage } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -44,7 +39,7 @@ export function useNovaReuniaoScreen() {
 
   const onSubmit = useCallback(
     async (data) => {
-      if (!celula?.id) return;
+      if (!celula?.id || !canManage) return;
       setSubmitting(true);
       try {
         await addReuniao(celula.id, {
@@ -60,7 +55,7 @@ export function useNovaReuniaoScreen() {
         setSubmitting(false);
       }
     },
-    [addReuniao, celula?.id, navigation, setError],
+    [addReuniao, canManage, celula?.id, navigation, setError],
   );
 
   return {

@@ -77,46 +77,34 @@ export const styles = StyleSheet.create({
     marginBottom: spacing[4],
   },
 
-  // Seletor de perfil (dentro do card)
-  roleSectionLabel: {
+  codigoToggle: {
+    alignSelf: 'center',
+    marginTop: spacing[3],
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+  codigoToggleText: {
+    ...type.caption,
+    color: colors.primary,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  codigoDivider: {
+    height: 1,
+    backgroundColor: colors.borderLight,
+    marginVertical: spacing[4],
+  },
+  codigoLabel: {
     ...type.label,
     color: colors.textMuted,
-    marginBottom: spacing[2],
+    marginBottom: spacing[1],
   },
-  roleRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: spacing[4],
-  },
-  roleBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderRadius: radii.md,
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.bgAlt,
-  },
-  roleBtnActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  roleBtnLabel: {
-    ...type.h4,
-    color: colors.textMuted,
-  },
-  roleBtnLabelActive: {
-    color: colors.primary,
-  },
-  roleBtnDesc: {
+  codigoHint: {
     ...type.caption,
     color: colors.textMuted,
-    marginTop: 2,
+    marginBottom: spacing[3],
+    lineHeight: 17,
     fontWeight: '400',
-  },
-  roleBtnDescActive: {
-    color: colors.textSecondary,
   },
 
   errorRoot: {

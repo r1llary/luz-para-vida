@@ -24,7 +24,7 @@ export const registroUsuarioSchema = z.object({
     .string()
     .min(6, 'Senha deve ter no mínimo 6 caracteres'),
   confirmarSenha: z.string(),
-  permissao: z.enum(['membro', 'lider']).default('membro'),
+  codigoAcesso: z.string().optional().default(''),
 }).refine((data) => data.senha === data.confirmarSenha, {
   message: 'As senhas não coincidem',
   path: ['confirmarSenha'],

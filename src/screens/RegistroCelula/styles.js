@@ -51,6 +51,47 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
   },
 
+  diasWrap: {
+    marginBottom: spacing[3],
+  },
+  diasLabel: {
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[2],
+  },
+  diasRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  diaBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: radii.md,
+    backgroundColor: colors.bgAlt,
+    borderWidth: 1.5,
+    borderColor: colors.borderLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  diaBtnAtivo: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  diaBtnText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.textMuted,
+    letterSpacing: 0.3,
+  },
+  diaBtnTextoAtivo: {
+    color: '#fff',
+  },
+  diaError: {
+    ...type.caption,
+    color: colors.error,
+    marginTop: 4,
+  },
+
   membroBlock: {
     marginBottom: spacing[3],
   },

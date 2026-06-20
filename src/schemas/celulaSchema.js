@@ -12,7 +12,10 @@ export const registroCelulaSchema = z.object({
   nomeCelula: z
     .string()
     .min(2, 'Nome da célula deve ter no mínimo 2 caracteres'),
-  dia: z.string().min(1, 'Dia é obrigatório'),
+  dia: z.enum(
+    ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+    { errorMap: () => ({ message: 'Selecione o dia da semana' }) },
+  ),
   horario: z.string().min(1, 'Horário é obrigatório'),
   local: z.string().optional(),
   membrosIniciais: z.array(membroInicialItem).optional(),

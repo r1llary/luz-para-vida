@@ -21,11 +21,9 @@ export function AuthProvider({ children }) {
       setInitialCheck(true);
       return;
     }
-    restoreAppwriteSessionFromStorage();
-    getCurrentUserFromAppwrite()
-      .then((u) => {
-        setUser(u || null);
-      })
+    restoreAppwriteSessionFromStorage()
+      .then(() => getCurrentUserFromAppwrite())
+      .then((u) => setUser(u || null))
       .catch(() => setUser(null))
       .finally(() => setInitialCheck(true));
   }, []);

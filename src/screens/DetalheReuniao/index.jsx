@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { styles } from './styles';
@@ -12,6 +12,8 @@ export default function DetalheReuniao() {
     dataLabel,
     nomesPresentes,
     legacyCount,
+    canManage,
+    openEditar,
   } = useDetalheReuniaoScreen();
 
   if (!reuniao) {
@@ -78,6 +80,16 @@ export default function DetalheReuniao() {
             <Text style={styles.value}>{reuniao.textoBase?.trim() || '—'}</Text>
           </View>
         </View>
+
+        {canManage ? (
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={openEditar}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editBtnText}>EDITAR REUNIÃO</Text>
+          </TouchableOpacity>
+        ) : null}
 
         <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
       </ScrollView>

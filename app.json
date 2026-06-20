@@ -32,7 +32,8 @@
         {
           "photosPermission": "O app acessa suas fotos para a foto de perfil."
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }

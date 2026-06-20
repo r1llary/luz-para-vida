@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { registroMembroSchema } from '../../schemas';
 import { useCelulas } from '../../contexts/CelulasContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { getUserByEmailAppwrite } from '../../services/appwrite';
 import { isAppwriteDatabaseConfigured } from '../../lib/appwrite';
 
@@ -12,6 +13,7 @@ export function useRegistroMembroScreen() {
   const { params } = useRoute();
   const celulaId = params?.celulaId;
   const { addMembro } = useCelulas();
+  const { canManage } = useAuth();
 
   const [submitting, setSubmitting] = useState(false);
   const [buscarEmail, setBuscarEmail] = useState('');
@@ -30,6 +32,7 @@ export function useRegistroMembroScreen() {
     resolver: zodResolver(registroMembroSchema),
     defaultValues: {
       nomeCompleto: '',
+      cpfRg: '',
       email: '',
       telefone: '',
       rua: '',
@@ -97,10 +100,10 @@ export function useRegistroMembroScreen() {
 
   const onSubmit = useCallback(
     async (data) => {
-      if (!celulaId) return;
+      if (!celulaId || !canManage) return;
       setSubmitting(true);
       try {
-        await addMembro({ ...data, cpfRg: '' }, celulaId);
+        await addMembro({ ...data, cpfRg: data.cpfRg ?? '' }, celulaId);
         navigation.goBack();
       } catch (e) {
         setError('root', {
@@ -110,7 +113,7 @@ export function useRegistroMembroScreen() {
         setSubmitting(false);
       }
     },
-    [addMembro, celulaId, navigation, setError],
+    [addMembro, canManage, celulaId, navigation, setError],
   );
 
   return {

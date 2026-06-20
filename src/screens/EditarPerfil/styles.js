@@ -72,6 +72,16 @@ export const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: colors.primary + '40',
   },
+  fotoPreviewPlaceholder: {
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fotoPreviewIniciais: {
+    ...type.h2,
+    color: colors.primary,
+    fontWeight: '800',
+  },
   fotoActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',

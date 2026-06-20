@@ -1,18 +1,15 @@
-import { useEffect, useMemo } from 'react';
-import { useRoute } from '@react-navigation/native';
+import { useEffect, useMemo, useCallback } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useCelulas } from '../../contexts/CelulasContext';
-
-function formatDateBr(iso) {
-  if (!iso || typeof iso !== 'string') return '';
-  const [y, m, d] = iso.split('-');
-  if (!y || !m || !d) return String(iso);
-  return `${d}/${m}/${y}`;
-}
+import { useAuth } from '../../contexts/AuthContext';
+import { formatDateBr } from '../../utils/date';
 
 export function useDetalheReuniaoScreen() {
+  const navigation = useNavigation();
   const { params } = useRoute();
   const reuniao = params?.reuniao;
   const celulaNome = params?.celulaNome;
+  const { canManage } = useAuth();
   const { fetchMembrosForCelula, getMembrosByCelula } = useCelulas();
 
   useEffect(() => {
@@ -38,11 +35,21 @@ export function useDetalheReuniaoScreen() {
 
   const legacyCount = Number(reuniao?.membrosPresentes) || 0;
 
+  const openEditar = useCallback(() => {
+    if (!reuniao || !canManage) return;
+    navigation.navigate('EditarReuniao', {
+      reuniao,
+      celula: { id: reuniao.celulaId, nomeCelula: celulaNome },
+    });
+  }, [navigation, reuniao, celulaNome, canManage]);
+
   return {
     reuniao,
     celulaNome,
     dataLabel,
     nomesPresentes,
     legacyCount,
+    canManage,
+    openEditar,
   };
 }
