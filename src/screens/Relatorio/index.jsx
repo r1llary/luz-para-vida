@@ -17,6 +17,7 @@ export default function Relatorio() {
     errors,
     filtradas,
     totais,
+    frequencia,
     formatDateBr,
     openReuniao,
     initialPeriod,
@@ -141,6 +142,32 @@ export default function Relatorio() {
             </Text>
           </TouchableOpacity>
         ))
+      )}
+
+      {frequencia.length > 0 && (
+        <>
+          <Text style={styles.secFreq}>Frequência dos membros</Text>
+          {frequencia.map((f) => {
+            const cor = f.pct >= 0.75 ? '#22C55E' : f.pct >= 0.5 ? '#C9A227' : '#EF4444';
+            return (
+              <View key={f.id} style={styles.freqRow}>
+                <View style={styles.freqTop}>
+                  <Text style={styles.freqNome} numberOfLines={1}>
+                    {f.pct < 0.5 ? '⚠ ' : ''}{f.nome}
+                  </Text>
+                  <Text style={[styles.freqPct, { color: cor }]}>
+                    {f.presencas}/{f.total} ({Math.round(f.pct * 100)}%)
+                  </Text>
+                </View>
+                <View style={styles.freqBar}>
+                  <View
+                    style={[styles.freqFill, { width: `${Math.round(f.pct * 100)}%`, backgroundColor: cor }]}
+                  />
+                </View>
+              </View>
+            );
+          })}
+        </>
       )}
     </ScrollView>
   );

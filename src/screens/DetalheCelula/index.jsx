@@ -168,7 +168,11 @@ export default function DetalheCelula() {
             <Text style={styles.sectionTitle}>{membros.length}</Text>
           </View>
           {membros.length === 0 ? (
-            <Text style={styles.sectionEmpty}>Nenhum membro cadastrado.</Text>
+            <Text style={styles.sectionEmpty}>
+              {canManage
+                ? 'Nenhum membro cadastrado. Toque no botão + abaixo para adicionar.'
+                : 'Nenhum membro cadastrado.'}
+            </Text>
           ) : (
             membros.map((m, idx) => (
               <View
@@ -237,6 +241,10 @@ export default function DetalheCelula() {
                     </Text>
                     <Text style={styles.reuniaoTema} numberOfLines={2}>
                       {r.temaMinistrado || 'Sem tema registrado'}
+                    </Text>
+                    <Text style={styles.reuniaoStats}>
+                      {r.membrosPresentes ?? 0} presentes
+                      {(r.visitantes ?? 0) > 0 ? ` · ${r.visitantes} visitantes` : ''}
                     </Text>
                   </View>
                 </TouchableOpacity>

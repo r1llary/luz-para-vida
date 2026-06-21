@@ -263,6 +263,12 @@ export const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginTop: 2,
   },
+  reuniaoStats: {
+    ...type.caption,
+    color: colors.accent,
+    fontWeight: '600',
+    marginTop: 4,
+  },
   reuniaoChevron: {
     width: 20,
     height: 20,

@@ -22,6 +22,7 @@ export function AuthProvider({ children }) {
       return;
     }
     restoreAppwriteSessionFromStorage()
+      .catch(() => { /* ignora erros de keychain e tenta a sessão de qualquer forma */ })
       .then(() => getCurrentUserFromAppwrite())
       .then((u) => setUser(u || null))
       .catch(() => setUser(null))

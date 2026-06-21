@@ -28,11 +28,26 @@ function parseMembrosPresentesIdsFromDoc(doc) {
   return [];
 }
 
+function parseVisitantesDetalhesFromDoc(doc) {
+  const raw = doc.visitantesDetalhes;
+  if (Array.isArray(raw)) return raw.filter((v) => v && v.nome);
+  if (typeof raw === 'string' && raw.trim()) {
+    try {
+      const p = JSON.parse(raw);
+      return Array.isArray(p) ? p.filter((v) => v && v.nome) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+  return [];
+}
+
 function mapReuniaoDocument(doc) {
   const n = normalizeDocument(doc);
   return {
     ...n,
     membrosPresentesIds: parseMembrosPresentesIdsFromDoc(n),
+    visitantesDetalhes: parseVisitantesDetalhesFromDoc(n),
   };
 }
 
@@ -124,21 +139,29 @@ export async function createReuniaoAppwrite(celulaId, dados) {
     : [];
   const membrosCount =
     ids.length > 0 ? ids.length : Number(dados.membrosPresentes) || 0;
+  const visitDet = Array.isArray(dados.visitantesDetalhes)
+    ? dados.visitantesDetalhes.filter((v) => v?.nome)
+    : [];
+  const visitCount = visitDet.length > 0 ? visitDet.length : Number(dados.visitantes) || 0;
   const basePayload = {
     celulaId,
     dataReuniao: dados.dataReuniao ?? '',
     temaMinistrado: dados.temaMinistrado ?? '',
     textoBase: dados.textoBase ?? '',
-    visitantes: Number(dados.visitantes) || 0,
+    visitantes: visitCount,
     membrosPresentes: membrosCount,
   };
   try {
     await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, {
       ...basePayload,
       membrosPresentesIds: JSON.stringify(ids),
+      visitantesDetalhes: JSON.stringify(visitDet),
     });
   } catch (_) {
-    await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, basePayload);
+    await d.createDocument(DATABASE_ID, COLLECTION_IDS.relatorios, docId, {
+      ...basePayload,
+      membrosPresentesIds: JSON.stringify(ids),
+    });
   }
   return docId;
 }
@@ -151,20 +174,28 @@ export async function updateReuniaoAppwrite(reuniaoId, dados) {
     ? dados.membrosPresentesIds.filter(Boolean)
     : [];
   const membrosCount = ids.length > 0 ? ids.length : Number(dados.membrosPresentes) || 0;
+  const visitDet = Array.isArray(dados.visitantesDetalhes)
+    ? dados.visitantesDetalhes.filter((v) => v?.nome)
+    : [];
+  const visitCount = visitDet.length > 0 ? visitDet.length : Number(dados.visitantes) || 0;
   const basePayload = {
     dataReuniao: dados.dataReuniao ?? '',
     temaMinistrado: dados.temaMinistrado ?? '',
     textoBase: dados.textoBase ?? '',
-    visitantes: Number(dados.visitantes) || 0,
+    visitantes: visitCount,
     membrosPresentes: membrosCount,
   };
   try {
     await d.updateDocument(DATABASE_ID, COLLECTION_IDS.relatorios, reuniaoId, {
       ...basePayload,
       membrosPresentesIds: JSON.stringify(ids),
+      visitantesDetalhes: JSON.stringify(visitDet),
     });
   } catch (_) {
-    await d.updateDocument(DATABASE_ID, COLLECTION_IDS.relatorios, reuniaoId, basePayload);
+    await d.updateDocument(DATABASE_ID, COLLECTION_IDS.relatorios, reuniaoId, {
+      ...basePayload,
+      membrosPresentesIds: JSON.stringify(ids),
+    });
   }
   return true;
 }

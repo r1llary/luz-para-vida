@@ -35,6 +35,10 @@ export function useDetalheReuniaoScreen() {
 
   const legacyCount = Number(reuniao?.membrosPresentes) || 0;
 
+  const visitantesDetalhes = Array.isArray(reuniao?.visitantesDetalhes)
+    ? reuniao.visitantesDetalhes.filter((v) => v?.nome)
+    : [];
+
   const openEditar = useCallback(() => {
     if (!reuniao || !canManage) return;
     navigation.navigate('EditarReuniao', {
@@ -49,6 +53,7 @@ export function useDetalheReuniaoScreen() {
     dataLabel,
     nomesPresentes,
     legacyCount,
+    visitantesDetalhes,
     canManage,
     openEditar,
   };

@@ -36,12 +36,8 @@ async function uploadFileToStorage(localUri, userId, bucketId) {
   const client = getAppwriteClient();
   if (!client) throw new Error('Cliente Appwrite não disponível.');
 
+  // Sessão incluída quando disponível; bucket aceita upload de guests também.
   const sessionSecret = resolveSession(client);
-  if (!sessionSecret) {
-    throw new Error(
-      'Sessão expirada. Saia e entre novamente para enviar a imagem.',
-    );
-  }
 
   let filePayload;
   if (typeof document !== 'undefined') {
@@ -57,23 +53,17 @@ async function uploadFileToStorage(localUri, userId, bucketId) {
   const formData = new FormData();
   formData.append('fileId', fileId);
   formData.append('file', filePayload);
-  [
-    Permission.read(Role.user(userId)),
-    Permission.update(Role.user(userId)),
-    Permission.delete(Role.user(userId)),
-  ].forEach((p) => formData.append('permissions[]', p));
+  // Leitura pública para que <Image> exiba sem header de autenticação.
+  // O bucket já controla update/delete via permissões de bucket (Users + Guests).
+  formData.append('permissions[]', Permission.read(Role.any()));
 
   const base = APPWRITE_ENDPOINT_CONFIG.replace(/\/$/, '');
   const url = `${base}/storage/buckets/${bucketId}/files`;
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'X-Appwrite-Project': APPWRITE_PROJECT_ID_CONFIG,
-      'X-Appwrite-Session': sessionSecret,
-    },
-    body: formData,
-  });
+  const headers = { 'X-Appwrite-Project': APPWRITE_PROJECT_ID_CONFIG };
+  if (sessionSecret) headers['X-Appwrite-Session'] = sessionSecret;
+
+  const res = await fetch(url, { method: 'POST', headers, body: formData });
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

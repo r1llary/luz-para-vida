@@ -117,6 +117,46 @@ export const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
+  secFreq: {
+    ...type.h4,
+    color: colors.text,
+    marginTop: spacing[5],
+    marginBottom: spacing[3],
+  },
+  freqRow: {
+    backgroundColor: colors.bgAlt,
+    borderRadius: radii.md,
+    padding: spacing[3],
+    marginBottom: spacing[2],
+  },
+  freqTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  freqNome: {
+    ...type.body,
+    fontWeight: '600',
+    color: colors.text,
+    flex: 1,
+    marginRight: spacing[2],
+  },
+  freqPct: {
+    ...type.caption,
+    fontWeight: '700',
+  },
+  freqBar: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.borderLight,
+    overflow: 'hidden',
+  },
+  freqFill: {
+    height: 6,
+    borderRadius: 3,
+  },
+
   empty: {
     ...type.bodySm,
     color: colors.textMuted,

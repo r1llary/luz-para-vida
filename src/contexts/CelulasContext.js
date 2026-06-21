@@ -165,13 +165,17 @@ export function CelulasProvider({ children }) {
         idsLocal.length > 0
           ? idsLocal.length
           : Number(dados.membrosPresentes) || 0;
+      const visitDetLocal = Array.isArray(dados.visitantesDetalhes)
+        ? dados.visitantesDetalhes.filter((v) => v?.nome)
+        : [];
       const novo = {
         id: String(Date.now()),
         celulaId,
         dataReuniao: dados.dataReuniao,
         temaMinistrado: dados.temaMinistrado ?? '',
         textoBase: dados.textoBase ?? '',
-        visitantes: Number(dados.visitantes) || 0,
+        visitantes: visitDetLocal.length > 0 ? visitDetLocal.length : Number(dados.visitantes) || 0,
+        visitantesDetalhes: visitDetLocal,
         membrosPresentes: membrosCountLocal,
         membrosPresentesIds: idsLocal,
         createdAt: new Date().toISOString(),
@@ -199,6 +203,9 @@ export function CelulasProvider({ children }) {
         ? dados.membrosPresentesIds.filter(Boolean)
         : [];
       const membrosCount = ids.length > 0 ? ids.length : 0;
+      const visitDet = Array.isArray(dados.visitantesDetalhes)
+        ? dados.visitantesDetalhes.filter((v) => v?.nome)
+        : [];
       setReunioes((prev) =>
         prev.map((r) =>
           r.id === reuniaoId
@@ -207,7 +214,8 @@ export function CelulasProvider({ children }) {
                 dataReuniao: dados.dataReuniao ?? r.dataReuniao,
                 temaMinistrado: dados.temaMinistrado ?? r.temaMinistrado,
                 textoBase: dados.textoBase ?? r.textoBase,
-                visitantes: Number(dados.visitantes) || r.visitantes,
+                visitantes: visitDet.length,
+                visitantesDetalhes: visitDet,
                 membrosPresentes: membrosCount,
                 membrosPresentesIds: ids,
               }

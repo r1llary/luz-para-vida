@@ -12,6 +12,7 @@ export default function DetalheReuniao() {
     dataLabel,
     nomesPresentes,
     legacyCount,
+    visitantesDetalhes,
     canManage,
     openEditar,
   } = useDetalheReuniaoScreen();
@@ -26,6 +27,7 @@ export default function DetalheReuniao() {
   }
 
   const temPresencaPorNome = nomesPresentes.length > 0;
+  const temVisitantesDetalhes = visitantesDetalhes.length > 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -47,7 +49,27 @@ export default function DetalheReuniao() {
         <View style={styles.detailCard}>
           <View style={styles.row}>
             <Text style={styles.label}>Visitantes</Text>
-            <Text style={styles.value}>{String(reuniao.visitantes ?? 0)}</Text>
+            {temVisitantesDetalhes ? (
+              <View style={styles.visitanteList}>
+                {visitantesDetalhes.map((v, idx) => (
+                  <View key={`${v.nome}-${idx}`} style={styles.visitanteItem}>
+                    <View style={styles.visitanteDot} />
+                    <View style={styles.visitanteInfo}>
+                      <Text style={styles.visitanteNome}>{v.nome}</Text>
+                      {v.contato ? (
+                        <Text style={styles.visitanteContato}>{v.contato}</Text>
+                      ) : null}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={styles.value}>
+                {(reuniao.visitantes ?? 0) > 0
+                  ? `${reuniao.visitantes} (registro anterior — apenas quantidade)`
+                  : '—'}
+              </Text>
+            )}
           </View>
 
           <View style={styles.row}>

@@ -91,6 +91,36 @@ export const styles = StyleSheet.create({
     color: colors.text,
   },
 
+  visitanteList: {
+    marginTop: 4,
+    gap: 6,
+  },
+  visitanteItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing[2],
+    paddingVertical: 3,
+  },
+  visitanteDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    marginTop: 7,
+  },
+  visitanteInfo: {
+    flex: 1,
+  },
+  visitanteNome: {
+    ...type.body,
+    color: colors.text,
+    fontWeight: '600',
+  },
+  visitanteContato: {
+    ...type.caption,
+    color: colors.textMuted,
+  },
+
   editBtn: {
     marginTop: spacing[2],
     paddingVertical: 13,

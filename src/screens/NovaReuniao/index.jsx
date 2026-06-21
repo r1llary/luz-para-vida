@@ -24,6 +24,9 @@ export default function NovaReuniao() {
     errors,
     onSubmit,
     submitting,
+    visitanteFields,
+    appendVisitante,
+    removeVisitante,
   } = useNovaReuniaoScreen();
 
   if (!celula) {
@@ -98,21 +101,66 @@ export default function NovaReuniao() {
                   />
                 )}
               />
-              <Controller
-                control={control}
-                name="visitantes"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    variant="auth"
-                    placeholder="Visitantes que compareceram"
-                    value={value === 0 ? '' : String(value)}
-                    onChangeText={(v) => onChange(v ? Number(v) : 0)}
-                    onBlur={onBlur}
-                    error={errors.visitantes?.message}
-                    keyboardType="number-pad"
-                  />
-                )}
-              />
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.visitantesLabel}>Visitantes</Text>
+              <Text style={styles.visitantesHint}>
+                Registre os visitantes que compareceram a esta reunião.
+              </Text>
+
+              {visitanteFields.map((field, index) => (
+                <View key={field.id} style={styles.visitanteCard}>
+                  <View style={styles.visitanteInputs}>
+                    <Controller
+                      control={control}
+                      name={`visitantesDetalhes.${index}.nome`}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <Input
+                          variant="auth"
+                          placeholder="Nome do visitante"
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          error={errors.visitantesDetalhes?.[index]?.nome?.message}
+                        />
+                      )}
+                    />
+                    <Controller
+                      control={control}
+                      name={`visitantesDetalhes.${index}.contato`}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <Input
+                          variant="auth"
+                          placeholder="Telefone ou e-mail (opcional)"
+                          value={value ?? ''}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                        />
+                      )}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    style={styles.visitanteRemoveBtn}
+                    onPress={() => removeVisitante(index)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text style={styles.visitanteRemoveBtnText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+
+              {visitanteFields.length === 0 && (
+                <Text style={styles.visitanteVazio}>Nenhum visitante adicionado.</Text>
+              )}
+
+              <TouchableOpacity
+                style={styles.visitanteAddBtn}
+                onPress={() => appendVisitante({ nome: '', contato: '' })}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.visitanteAddBtnText}>+ Adicionar visitante</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.card}>

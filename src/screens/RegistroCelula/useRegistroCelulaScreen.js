@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -9,25 +9,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { uploadCelulaImageFromUri, getFileViewUrl } from '../../services/appwrite';
 import { isAppwriteConfigured } from '../../lib/appwrite';
 
-function buildMembroInicialPayload(item) {
-  return {
-    nomeCompleto: item.nomeCompleto?.trim() ?? '',
-    cpfRg: '',
-    email: '',
-    telefone: item.telefone?.trim() ?? '',
-    rua: '',
-    numero: '',
-    complemento: '',
-    bairro: '',
-    cidade: '',
-    cep: '',
-    data: '',
-  };
-}
-
 export function useRegistroCelulaScreen() {
   const navigation = useNavigation();
-  const { addCelula, addMembro } = useCelulas();
+  const { addCelula } = useCelulas();
   const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [imageUri, setImageUri] = useState(null);
@@ -44,13 +28,7 @@ export function useRegistroCelulaScreen() {
       dia: '',
       horario: '',
       local: '',
-      membrosIniciais: [],
     },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'membrosIniciais',
   });
 
   const pickImagem = useCallback(async () => {
@@ -78,8 +56,12 @@ export function useRegistroCelulaScreen() {
           try {
             const fileId = await uploadCelulaImageFromUri(imageUri, user.id);
             if (fileId) imagemUrl = String(getFileViewUrl(fileId) ?? '');
-          } catch (_) {
-            /* imagem falhou — célula é criada sem foto */
+          } catch (imgErr) {
+            setError('root', {
+              message: `A imagem não pôde ser enviada: ${imgErr?.message ?? 'erro desconhecido'}. A célula será cadastrada sem foto.`,
+            });
+            // Aguarda 2s para o usuário ler o aviso e segue sem imagem
+            await new Promise((r) => setTimeout(r, 2000));
           }
         }
 
@@ -92,13 +74,6 @@ export function useRegistroCelulaScreen() {
         });
 
         if (id != null) {
-          const membros = data.membrosIniciais ?? [];
-          for (const item of membros) {
-            const nome = item?.nomeCompleto?.trim();
-            if (nome && nome.length >= 3) {
-              await addMembro(buildMembroInicialPayload(item), id);
-            }
-          }
           navigation.replace('DetalheCelula', {
             celula: {
               id,
@@ -118,7 +93,7 @@ export function useRegistroCelulaScreen() {
         setSubmitting(false);
       }
     },
-    [addCelula, addMembro, imageUri, navigation, setError, user?.id],
+    [addCelula, imageUri, navigation, setError, user?.id],
   );
 
   return {
@@ -127,9 +102,6 @@ export function useRegistroCelulaScreen() {
     errors,
     onSubmit,
     submitting,
-    membrosFields: fields,
-    appendMembro: () => append({ nomeCompleto: '', telefone: '' }),
-    removeMembro: remove,
     imageUri,
     pickImagem,
     removeImagem,

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { reuniaoSchema } from '../../schemas';
@@ -32,9 +32,14 @@ export function useNovaReuniaoScreen() {
       dataReuniao: '',
       temaMinistrado: '',
       textoBase: '',
-      visitantes: 0,
+      visitantesDetalhes: [],
       membrosPresentesIds: [],
     },
+  });
+
+  const { fields: visitanteFields, append: appendVisitante, remove: removeVisitante } = useFieldArray({
+    control,
+    name: 'visitantesDetalhes',
   });
 
   const onSubmit = useCallback(
@@ -66,5 +71,8 @@ export function useNovaReuniaoScreen() {
     errors,
     onSubmit,
     submitting,
+    visitanteFields,
+    appendVisitante,
+    removeVisitante,
   };
 }

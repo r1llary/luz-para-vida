@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { reuniaoSchema } from '../../schemas';
@@ -33,11 +33,18 @@ export function useEditarReuniaoScreen() {
       dataReuniao: formatDateBr(reuniao?.dataReuniao ?? ''),
       temaMinistrado: reuniao?.temaMinistrado ?? '',
       textoBase: reuniao?.textoBase ?? '',
-      visitantes: reuniao?.visitantes ?? 0,
+      visitantesDetalhes: Array.isArray(reuniao?.visitantesDetalhes)
+        ? reuniao.visitantesDetalhes
+        : [],
       membrosPresentesIds: Array.isArray(reuniao?.membrosPresentesIds)
         ? reuniao.membrosPresentesIds
         : [],
     },
+  });
+
+  const { fields: visitanteFields, append: appendVisitante, remove: removeVisitante } = useFieldArray({
+    control,
+    name: 'visitantesDetalhes',
   });
 
   const onSubmit = useCallback(
@@ -47,6 +54,7 @@ export function useEditarReuniaoScreen() {
       try {
         const isoDate = toISODate(data.dataReuniao);
         const ids = Array.isArray(data.membrosPresentesIds) ? data.membrosPresentesIds : [];
+        const visitDet = (data.visitantesDetalhes ?? []).filter((v) => v?.nome);
         await updateReuniao(reuniao.id, celula.id, { ...data, dataReuniao: isoDate });
         navigation.navigate('DetalheReuniao', {
           reuniao: {
@@ -54,7 +62,8 @@ export function useEditarReuniaoScreen() {
             dataReuniao: isoDate,
             temaMinistrado: data.temaMinistrado,
             textoBase: data.textoBase ?? '',
-            visitantes: Number(data.visitantes) || 0,
+            visitantes: visitDet.length,
+            visitantesDetalhes: visitDet,
             membrosPresentes: ids.length,
             membrosPresentesIds: ids,
           },
@@ -79,5 +88,8 @@ export function useEditarReuniaoScreen() {
     errors,
     onSubmit,
     submitting,
+    visitanteFields,
+    appendVisitante,
+    removeVisitante,
   };
 }

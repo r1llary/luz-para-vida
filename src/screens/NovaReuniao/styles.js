@@ -97,6 +97,61 @@ export const styles = StyleSheet.create({
     color: colors.text,
   },
 
+  visitantesLabel: {
+    ...type.label,
+    color: colors.textMuted,
+    marginBottom: spacing[2],
+  },
+  visitantesHint: {
+    ...type.caption,
+    color: colors.textMuted,
+    marginBottom: spacing[3],
+    lineHeight: 17,
+    fontWeight: '400',
+  },
+  visitanteVazio: {
+    ...type.bodySm,
+    color: colors.textMuted,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginBottom: spacing[3],
+  },
+  visitanteCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing[2],
+    gap: spacing[2],
+  },
+  visitanteInputs: {
+    flex: 1,
+  },
+  visitanteRemoveBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.errorBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  visitanteRemoveBtnText: {
+    fontSize: 14,
+    color: colors.error,
+    fontWeight: '700',
+  },
+  visitanteAddBtn: {
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    borderRadius: radii.lg,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginTop: spacing[1],
+  },
+  visitanteAddBtnText: {
+    ...type.label,
+    color: colors.primary,
+  },
+
   errorRoot: {
     ...type.caption,
     color: colors.error,

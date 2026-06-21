@@ -33,9 +33,6 @@ export default function RegistroCelula() {
     errors,
     onSubmit,
     submitting,
-    membrosFields,
-    appendMembro,
-    removeMembro,
     imageUri,
     pickImagem,
     removeImagem,
@@ -156,60 +153,6 @@ export default function RegistroCelula() {
                   />
                 )}
               />
-            </View>
-
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Membros iniciais (opcional)</Text>
-              {membrosFields.map((field, index) => (
-                <View key={field.id} style={styles.membroBlock}>
-                  <Controller
-                    control={control}
-                    name={`membrosIniciais.${index}.nomeCompleto`}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <Input
-                        variant="auth"
-                        placeholder="Nome completo"
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        error={errors.membrosIniciais?.[index]?.nomeCompleto?.message}
-                      />
-                    )}
-                  />
-                  <Controller
-                    control={control}
-                    name={`membrosIniciais.${index}.telefone`}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <Input
-                        variant="auth"
-                        placeholder="Telefone (opcional)"
-                        value={value ?? ''}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        keyboardType="phone-pad"
-                      />
-                    )}
-                  />
-                  <TouchableOpacity
-                    onPress={() => removeMembro(index)}
-                    accessibilityRole="button"
-                    accessibilityLabel="Remover membro"
-                  >
-                    <Text style={styles.removeMembro}>Remover</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity
-                onPress={appendMembro}
-                accessibilityRole="button"
-                accessibilityLabel="Adicionar membro"
-              >
-                <Text style={styles.addMembro}>+ Adicionar membro</Text>
-              </TouchableOpacity>
-
-              <Text style={styles.hint}>
-                As reuniões da célula são registradas depois, na tela de detalhes.
-              </Text>
 
               {errors.root?.message ? (
                 <Text style={styles.errorRoot}>{errors.root.message}</Text>

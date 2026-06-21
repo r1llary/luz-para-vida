@@ -174,10 +174,10 @@ export async function signUpWithAppwrite(profile) {
         },
       );
     } catch (e) {
-      // Conta foi criada mas o perfil falhou. O usuário pode fazer login e
-      // editar o perfil para completar o cadastro.
+      // Limpa a sessão órfã para que o próximo cadastro funcione normalmente.
+      try { await signOutFromAppwrite(); } catch (_) {}
       throw new Error(
-        'Conta criada, mas houve um erro ao salvar o perfil. Faça login e complete seu perfil nas configurações.',
+        'Houve um erro ao salvar o perfil. Tente se cadastrar novamente.',
       );
     }
   }
@@ -249,8 +249,12 @@ export async function updateProfileInAppwrite(payload, currentUser) {
   if (removeFoto) {
     fotoPerfilId = '';
   } else if (fotoUri) {
-    const id = await uploadAvatarFromUri(fotoUri, userId);
-    if (id) fotoPerfilId = id;
+    try {
+      const id = await uploadAvatarFromUri(fotoUri, userId);
+      if (id) fotoPerfilId = id;
+    } catch (_) {
+      /* upload falhou; mantém foto atual e continua salvando o restante do perfil */
+    }
   }
 
   if (databases && DATABASE_ID && COLLECTION_IDS.usuarios) {
@@ -276,7 +280,7 @@ export async function updateProfileInAppwrite(payload, currentUser) {
         {
           userId,
           ...docPayload,
-          permissao: 'membro',
+          permissao: currentUser?.permissao ?? 'membro',
         },
       );
     }
