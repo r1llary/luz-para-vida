@@ -15,6 +15,7 @@ import { Button } from '../../components/Buttons';
 import { AuthLogo } from '../../components/AuthLogo';
 import { styles } from './styles';
 import { useRegistroUsuarioScreen } from './useRegistroUsuarioScreen';
+import { maskDateInput } from '../../utils/date';
 
 export default function RegistroUsuario() {
   const {
@@ -85,9 +86,11 @@ export default function RegistroUsuario() {
                     variant="auth"
                     placeholder="Data de nascimento (DD/MM/AAAA)"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(maskDateInput(text))}
                     onBlur={onBlur}
                     error={errors.dataNascimento?.message}
+                    keyboardType="numeric"
+                    maxLength={10}
                   />
                 )}
               />
@@ -165,14 +168,14 @@ export default function RegistroUsuario() {
                   onPress={() => setMostrarCodigo(true)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.codigoToggleText}>Sou líder de célula →</Text>
+                  <Text style={styles.codigoToggleText}>Tenho um código de acesso →</Text>
                 </TouchableOpacity>
               ) : (
                 <>
                   <View style={styles.codigoDivider} />
-                  <Text style={styles.codigoLabel}>Código de líder</Text>
+                  <Text style={styles.codigoLabel}>Código de acesso</Text>
                   <Text style={styles.codigoHint}>
-                    Insira o código recebido do seu pastor.
+                    Insira o código recebido do seu pastor ou administrador.
                   </Text>
                   <Controller
                     control={control}
@@ -216,7 +219,7 @@ export default function RegistroUsuario() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

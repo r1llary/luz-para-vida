@@ -5,16 +5,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { PerfilStack } from './PerfilStack';
 import { CelulasStack } from './CelulasStack';
 import { RelatoriosStack } from './RelatoriosStack';
+import { useAuth } from '../contexts/AuthContext';
 
 const Tab = createBottomTabNavigator();
 
-const TABS = [
+const ALL_TABS = [
   {
     name: 'PerfilTab',
     label: 'Perfil',
     icon: 'person',
     iconOutline: 'person-outline',
     component: PerfilStack,
+    requiresManage: false,
   },
   {
     name: 'CelulasTab',
@@ -22,6 +24,7 @@ const TABS = [
     icon: 'grid',
     iconOutline: 'grid-outline',
     component: CelulasStack,
+    requiresManage: false,
   },
   {
     name: 'RelatoriosTab',
@@ -29,12 +32,16 @@ const TABS = [
     icon: 'bar-chart',
     iconOutline: 'bar-chart-outline',
     component: RelatoriosStack,
+    requiresManage: true,
   },
 ];
 
 export function MainTabs() {
   const insets = useSafeAreaInsets();
   const tabPadBottom = Math.max(insets.bottom, 8);
+  const { canManage } = useAuth();
+
+  const tabs = ALL_TABS.filter((t) => !t.requiresManage || canManage);
 
   return (
     <Tab.Navigator
@@ -52,7 +59,7 @@ export function MainTabs() {
         tabBarInactiveTintColor: 'rgba(255,255,255,0.5)',
         tabBarLabelStyle: { fontWeight: '700', fontSize: 10, letterSpacing: 0.2 },
         tabBarIcon: ({ focused, color }) => {
-          const tab = TABS.find((t) => t.name === route.name);
+          const tab = ALL_TABS.find((t) => t.name === route.name);
           if (!tab) return null;
           return (
             <Ionicons
@@ -64,7 +71,7 @@ export function MainTabs() {
         },
       })}
     >
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <Tab.Screen
           key={tab.name}
           name={tab.name}

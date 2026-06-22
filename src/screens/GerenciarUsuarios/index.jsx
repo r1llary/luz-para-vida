@@ -100,7 +100,7 @@ export default function GerenciarUsuarios() {
           })
         )}
 
-        <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+        <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
       </ScrollView>
     </SafeAreaView>
   );

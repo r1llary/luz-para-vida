@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
 import { registroUsuarioSchema } from '../../schemas';
 import { useAuth } from '../../contexts/AuthContext';
-import { CODIGO_LIDER } from '../../config/accessCodes';
+import { CODIGO_LIDER, CODIGO_ADMIN } from '../../config/accessCodes';
 
 export function useRegistroUsuarioScreen() {
   const navigation = useNavigation();
@@ -28,7 +28,11 @@ export function useRegistroUsuarioScreen() {
   });
 
   const onSubmit = async (data) => {
-    const permissao = data.codigoAcesso?.trim() === CODIGO_LIDER ? 'lider' : 'membro';
+    const codigo = data.codigoAcesso?.trim();
+    const permissao =
+      codigo === CODIGO_ADMIN ? 'admin' :
+      codigo === CODIGO_LIDER ? 'lider' :
+      'membro';
     const result = await signUp({
       nomeCompleto: data.nomeCompleto,
       email: data.email,

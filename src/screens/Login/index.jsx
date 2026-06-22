@@ -125,7 +125,7 @@ export default function Login() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

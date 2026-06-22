@@ -119,7 +119,7 @@ export default function MinhasCelulas() {
   );
 
   const ListFooter = useCallback(
-    () => <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>,
+    () => <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>,
     [],
   );
 

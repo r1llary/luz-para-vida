@@ -235,10 +235,15 @@ export async function listMembrosByEmailAppwrite(email) {
   if (!ensureConfig() || !email) return [];
   const d = db();
   if (!d) return [];
-  const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.membros, [
-    Query.equal('email', [email]),
-  ]);
-  return (res.documents || []).map(normalizeDocument);
+  try {
+    const res = await d.listDocuments(DATABASE_ID, COLLECTION_IDS.membros, [
+      Query.equal('email', [email.toLowerCase().trim()]),
+    ]);
+    return (res.documents || []).map(normalizeDocument);
+  } catch (_) {
+    // Campo 'email' pode não ter índice na coleção membros — retorna vazio sem quebrar
+    return [];
+  }
 }
 
 export async function listCelulasByIdsAppwrite(ids) {
@@ -279,7 +284,7 @@ export async function createMembroAppwrite(celulaId, membro) {
       celulaId,
       nomeCompleto: membro.nomeCompleto ?? '',
       cpfRg: membro.cpfRg ?? '',
-      email: membro.email ?? '',
+      email: (membro.email ?? '').toLowerCase().trim(),
       telefone: membro.telefone ?? '',
       rua: membro.rua ?? '',
       numero: membro.numero ?? '',
@@ -291,6 +296,40 @@ export async function createMembroAppwrite(celulaId, membro) {
     }
   );
   return id;
+}
+
+export async function getUsuarioByIdAppwrite(userId) {
+  if (!ensureConfig() || !userId) return null;
+  const d = db();
+  if (!d) return null;
+  try {
+    const doc = await d.getDocument(DATABASE_ID, COLLECTION_IDS.usuarios, userId);
+    return doc ? normalizeDocument(doc) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+export async function updateCelulaAppwrite(celulaId, dados) {
+  if (!ensureConfig() || !celulaId) return false;
+  const d = db();
+  if (!d) return false;
+  await d.updateDocument(DATABASE_ID, COLLECTION_IDS.celulas, celulaId, {
+    nomeCelula: dados.nomeCelula ?? '',
+    dia: dados.dia ?? '',
+    horario: dados.horario ?? '',
+    local: dados.local ?? '',
+    imagemUrl: dados.imagemUrl ?? '',
+  });
+  return true;
+}
+
+export async function removeMembroAppwrite(membroId) {
+  if (!ensureConfig() || !membroId) return false;
+  const d = db();
+  if (!d) return false;
+  await d.deleteDocument(DATABASE_ID, COLLECTION_IDS.membros, membroId);
+  return true;
 }
 
 /** @deprecated use listReunioesByCelulaAppwrite */

@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
 
   // ── Header ──────────────────────────────────────────────
   screenHeader: {
-    flexDirection: 'row',
+    flexDirection: 'row', 
     alignItems: 'center',
     backgroundColor: colors.primary,
     paddingHorizontal: spacing[4],
@@ -116,10 +116,26 @@ export const styles = StyleSheet.create({
     padding: spacing[4],
     ...shadows.sm,
   },
+  infoNomeRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing[2],
+  },
   infoNome: {
     ...type.h2,
     color: colors.text,
+  },
+  liderNome: {
+    fontSize: 13,
+    color: colors.textSecondary,
     marginBottom: spacing[2],
+  },
+  editarLink: {
+    ...type.label,
+    color: colors.accent,
+    fontWeight: '700',
+    marginTop: 4,
+    marginLeft: spacing[2],
   },
   infoMetaRow: {
     flexDirection: 'row',
@@ -178,6 +194,12 @@ export const styles = StyleSheet.create({
     color: colors.accent,
     fontWeight: '700',
   },
+  sectionHint: {
+    fontSize: 10,
+    color: colors.textMuted,
+    marginTop: 1,
+    opacity: 0.7,
+  },
   sectionEmpty: {
     ...type.body,
     color: colors.textMuted,
@@ -209,7 +231,7 @@ export const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
   },
-  membroInfo: { flex: 1 },
+  membroInfo: { flex: 1, minWidth: 0 },
   membroNome: {
     ...type.body,
     color: colors.text,

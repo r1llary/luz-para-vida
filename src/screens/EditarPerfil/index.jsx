@@ -17,6 +17,7 @@ import { Button } from '../../components/Buttons';
 import { styles } from './styles';
 import { colors } from '../../theme';
 import { useEditarPerfilScreen } from './useEditarPerfilScreen';
+import { maskDateInput } from '../../utils/date';
 
 export default function EditarPerfil() {
   const {
@@ -134,9 +135,11 @@ export default function EditarPerfil() {
                     variant="auth"
                     placeholder="Data de nascimento (DD/MM/AAAA)"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(maskDateInput(text))}
                     onBlur={onBlur}
                     error={errors.dataNascimento?.message}
+                    keyboardType="numeric"
+                    maxLength={10}
                   />
                 )}
               />
@@ -248,7 +251,7 @@ export default function EditarPerfil() {
             </View>
           </View>
 
-          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

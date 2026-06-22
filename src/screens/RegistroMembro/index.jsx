@@ -13,6 +13,7 @@ import { Input } from '../../components/Inputs';
 import { Button } from '../../components/Buttons';
 import { styles } from './styles';
 import { useRegistroMembroScreen } from './useRegistroMembroScreen';
+import { maskDateInput } from '../../utils/date';
 
 export default function RegistroMembro() {
   const {
@@ -164,9 +165,11 @@ export default function RegistroMembro() {
                     variant="auth"
                     placeholder="Data de nascimento (DD/MM/AAAA)"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(maskDateInput(text))}
                     onBlur={onBlur}
                     error={errors.data?.message}
+                    keyboardType="numeric"
+                    maxLength={10}
                   />
                 )}
               />
@@ -282,7 +285,7 @@ export default function RegistroMembro() {
             </View>
           </View>
 
-          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

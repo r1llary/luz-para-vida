@@ -7,8 +7,10 @@ import {
   listCelulasByIdsAppwrite,
   listMembrosByEmailAppwrite,
   createCelulaAppwrite,
+  updateCelulaAppwrite,
   listMembrosByCelulaAppwrite,
   createMembroAppwrite,
+  removeMembroAppwrite,
   listReunioesByCelulaAppwrite,
   createReuniaoAppwrite,
   updateReuniaoAppwrite,
@@ -119,20 +121,15 @@ export function CelulasProvider({ children }) {
   const addMembro = useCallback(
     async (membro, celulaId) => {
       if (isAppwriteDatabaseConfigured()) {
-        try {
-          const id = await createMembroAppwrite(celulaId, membro);
-          if (id) {
-            const list = await listMembrosByCelulaAppwrite(celulaId);
-            setMembros((prev) => [
-              ...prev.filter((m) => m.celulaId !== celulaId),
-              ...list,
-            ]);
-            return id;
-          }
-        } catch (_) {
-          /* fallback local */
-        }
+        // Quando Appwrite está configurado, falhas lançam erro para o chamador
+        // (não cai em fallback local que some ao primeiro re-fetch)
+        const id = await createMembroAppwrite(celulaId, membro);
+        if (!id) throw new Error('Servidor não retornou ID do membro criado.');
+        const novoMembro = { id, celulaId, ...membro, createdAt: new Date().toISOString() };
+        setMembros((prev) => [...prev, novoMembro]);
+        return id;
       }
+      // Fallback offline
       const novo = {
         id: String(Date.now()),
         celulaId,
@@ -227,6 +224,44 @@ export function CelulasProvider({ children }) {
     [fetchReunioesForCelula]
   );
 
+  const updateCelula = useCallback(
+    async (celulaId, dados) => {
+      if (isAppwriteDatabaseConfigured() && user?.id) {
+        try {
+          await updateCelulaAppwrite(celulaId, dados);
+          const list = isAdmin
+            ? await listAllCelulasAppwrite()
+            : await listCelulasAppwrite(user.id);
+          setCelulas(list);
+          return true;
+        } catch (_) { /* fallback local */ }
+      }
+      setCelulas((prev) =>
+        prev.map((c) => (c.id === celulaId ? { ...c, ...dados } : c))
+      );
+      return true;
+    },
+    [user?.id, isAdmin]
+  );
+
+  const removeMembro = useCallback(async (membroId, celulaId) => {
+    if (isAppwriteDatabaseConfigured()) {
+      try {
+        await removeMembroAppwrite(membroId);
+        const list = await listMembrosByCelulaAppwrite(celulaId);
+        setMembros((prev) => [
+          ...prev.filter((m) => m.celulaId !== celulaId),
+          ...list,
+        ]);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    setMembros((prev) => prev.filter((m) => m.id !== membroId));
+    return true;
+  }, []);
+
   const getMembrosByCelula = useCallback(
     (celulaId) => membros.filter((m) => m.celulaId === celulaId),
     [membros]
@@ -248,7 +283,9 @@ export function CelulasProvider({ children }) {
     reunioes,
     loadingCelulas,
     addCelula,
+    updateCelula,
     addMembro,
+    removeMembro,
     addReuniao,
     updateReuniao,
     getMembrosByCelula,

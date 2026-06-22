@@ -4,23 +4,57 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
-import { Controller } from 'react-hook-form';
-import { Input } from '../../components/Inputs';
 import { styles } from './styles';
-import { useRelatorioScreen } from './useRelatorioScreen';
+import { useRelatorioScreen, MONTH_NAMES_FULL } from './useRelatorioScreen';
+
+const TABS = [
+  { key: 'frequencia', label: 'Frequência' },
+  { key: 'visitantes', label: 'Visitantes' },
+  { key: 'reunioes', label: 'Reuniões' },
+];
+
+function BarChart({ data }) {
+  const maxVal = Math.max(...data.map((d) => d.total), 1);
+  return (
+    <View style={styles.chartContainer}>
+      {data.map((item, i) => {
+        const barH = item.total > 0 ? Math.max((item.total / maxVal) * 80, 4) : 0;
+        return (
+          <View key={i} style={styles.chartCol}>
+            {item.total > 0 && (
+              <Text style={styles.chartValue}>{item.total}</Text>
+            )}
+            <View style={[styles.chartBar, { height: barH }]} />
+            <Text style={styles.chartLabel} numberOfLines={1}>
+              {item.label}
+            </Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
 
 export default function Relatorio() {
   const {
     celula,
-    control,
-    errors,
+    mes,
+    ano,
+    prevMonth,
+    nextMonth,
     filtradas,
     totais,
     frequencia,
+    visitantesList,
+    evolucaoVisitantes,
     formatDateBr,
     openReuniao,
-    initialPeriod,
+    activeTab,
+    setActiveTab,
+    exportingPdf,
+    exportPdf,
   } = useRelatorioScreen();
 
   if (!celula) {
@@ -40,133 +74,169 @@ export default function Relatorio() {
     >
       <Text style={styles.title}>RELATÓRIO MENSAL</Text>
       <Text style={styles.subtitle}>{celula.nomeCelula}</Text>
-      <Text style={styles.hint}>
-        Escolha o mês e o ano para ver as reuniões e totais.
-      </Text>
 
-      <View style={styles.rowInputs}>
-        <View style={[styles.inputHalf, styles.inputHalfLeft]}>
-          <Controller
-            control={control}
-            name="mes"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                variant="auth"
-                placeholder="Mês (1–12)"
-                value={
-                  value === '' || value === undefined || value === null
-                    ? ''
-                    : String(value)
-                }
-                onChangeText={(v) => {
-                  const digits = v.replace(/[^\d]/g, '');
-                  if (digits === '') {
-                    onChange(initialPeriod.mes);
-                    return;
-                  }
-                  let n = Number(digits);
-                  if (n < 1) n = 1;
-                  if (n > 12) n = 12;
-                  onChange(n);
-                }}
-                onBlur={onBlur}
-                error={errors.mes?.message}
-                keyboardType="number-pad"
-              />
-            )}
-          />
+      {/* Seletor de mês/ano */}
+      <View style={styles.periodRow}>
+        <TouchableOpacity
+          style={styles.periodArrow}
+          onPress={prevMonth}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 4, right: 4 }}
+        >
+          <Text style={styles.periodArrowText}>‹</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.periodLabel}>
+          {MONTH_NAMES_FULL[mes - 1]} {ano}
+        </Text>
+
+        <TouchableOpacity
+          style={styles.periodArrow}
+          onPress={nextMonth}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 4, right: 4 }}
+        >
+          <Text style={styles.periodArrowText}>›</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* KPIs */}
+      <View style={styles.kpiRow}>
+        <View style={styles.kpiCard}>
+          <Text style={styles.kpiNum}>{totais.reunioes}</Text>
+          <Text style={styles.kpiLabel}>Reuniões</Text>
         </View>
-        <View style={[styles.inputHalf, styles.inputHalfRight]}>
-          <Controller
-            control={control}
-            name="ano"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <Input
-                variant="auth"
-                placeholder="Ano (ex.: 2026)"
-                value={
-                  value === '' || value === undefined || value === null
-                    ? ''
-                    : String(value)
-                }
-                onChangeText={(v) => {
-                  const digits = v.replace(/[^\d]/g, '');
-                  if (digits === '') {
-                    onChange(initialPeriod.ano);
-                    return;
-                  }
-                  onChange(Number(digits));
-                }}
-                onBlur={onBlur}
-                error={errors.ano?.message}
-                keyboardType="number-pad"
-              />
-            )}
-          />
+        <View style={styles.kpiCard}>
+          <Text style={styles.kpiNum}>{totais.visitantes}</Text>
+          <Text style={styles.kpiLabel}>Visitantes</Text>
+        </View>
+        <View style={[styles.kpiCard, styles.kpiCardLast]}>
+          <Text style={styles.kpiNum}>{totais.membrosPresentes}</Text>
+          <Text style={styles.kpiLabel}>Presenças</Text>
         </View>
       </View>
 
-      <View style={styles.cardResumo}>
-        <Text style={styles.resumoTitulo}>Resumo do período</Text>
-        <Text style={styles.resumoLinha}>
-          Reuniões: <Text style={styles.resumoNum}>{totais.reunioes}</Text>
-        </Text>
-        <Text style={styles.resumoLinha}>
-          Total visitantes:{' '}
-          <Text style={styles.resumoNum}>{totais.visitantes}</Text>
-        </Text>
-        <Text style={styles.resumoLinha}>
-          Soma membros presentes:{' '}
-          <Text style={styles.resumoNum}>{totais.membrosPresentes}</Text>
-        </Text>
-      </View>
+      {/* Exportar PDF */}
+      <TouchableOpacity
+        style={styles.pdfBtn}
+        onPress={exportPdf}
+        activeOpacity={0.85}
+        disabled={exportingPdf}
+      >
+        {exportingPdf ? (
+          <ActivityIndicator color="#fff" size="small" />
+        ) : (
+          <Text style={styles.pdfBtnText}>Exportar PDF</Text>
+        )}
+      </TouchableOpacity>
 
-      <Text style={styles.secReunioes}>Reuniões no mês</Text>
-      {filtradas.length === 0 ? (
-        <Text style={styles.empty}>
-          Nenhuma reunião neste mês.
-        </Text>
-      ) : (
-        filtradas.map((r) => (
+      {/* Abas */}
+      <View style={styles.tabRow}>
+        {TABS.map((t) => (
           <TouchableOpacity
-            key={r.id}
-            style={styles.reuniaoRow}
-            onPress={() => openReuniao(r)}
-            activeOpacity={0.85}
+            key={t.key}
+            style={[styles.tab, activeTab === t.key && styles.tabActive]}
+            onPress={() => setActiveTab(t.key)}
+            activeOpacity={0.8}
           >
-            <Text style={styles.reuniaoData}>
-              {formatDateBr(r.dataReuniao)}
-            </Text>
-            <Text style={styles.reuniaoTema} numberOfLines={2}>
-              {r.temaMinistrado || '—'}
+            <Text style={[styles.tabText, activeTab === t.key && styles.tabTextActive]}>
+              {t.label}
             </Text>
           </TouchableOpacity>
-        ))
+        ))}
+      </View>
+
+      {/* Aba: Frequência */}
+      {activeTab === 'frequencia' && (
+        <>
+          {frequencia.length === 0 ? (
+            <Text style={styles.empty}>
+              {filtradas.length === 0
+                ? 'Nenhuma reunião neste mês.'
+                : 'Sem dados de presença registrados.'}
+            </Text>
+          ) : (
+            frequencia.map((f) => {
+              const cor =
+                f.pct >= 0.75 ? '#22C55E' : f.pct >= 0.5 ? '#C9A227' : '#EF4444';
+              return (
+                <View key={f.id} style={styles.freqRow}>
+                  <View style={styles.freqTop}>
+                    <Text style={styles.freqNome} numberOfLines={1}>
+                      {f.pct < 0.5 ? '⚠ ' : ''}{f.nome}
+                    </Text>
+                    <Text style={[styles.freqPct, { color: cor }]}>
+                      {f.presencas}/{f.total} ({Math.round(f.pct * 100)}%)
+                    </Text>
+                  </View>
+                  <View style={styles.freqBar}>
+                    <View
+                      style={[
+                        styles.freqFill,
+                        { width: `${Math.round(f.pct * 100)}%`, backgroundColor: cor },
+                      ]}
+                    />
+                  </View>
+                </View>
+              );
+            })
+          )}
+        </>
       )}
 
-      {frequencia.length > 0 && (
+      {/* Aba: Visitantes */}
+      {activeTab === 'visitantes' && (
         <>
-          <Text style={styles.secFreq}>Frequência dos membros</Text>
-          {frequencia.map((f) => {
-            const cor = f.pct >= 0.75 ? '#22C55E' : f.pct >= 0.5 ? '#C9A227' : '#EF4444';
-            return (
-              <View key={f.id} style={styles.freqRow}>
-                <View style={styles.freqTop}>
-                  <Text style={styles.freqNome} numberOfLines={1}>
-                    {f.pct < 0.5 ? '⚠ ' : ''}{f.nome}
-                  </Text>
-                  <Text style={[styles.freqPct, { color: cor }]}>
-                    {f.presencas}/{f.total} ({Math.round(f.pct * 100)}%)
-                  </Text>
-                </View>
-                <View style={styles.freqBar}>
-                  <View
-                    style={[styles.freqFill, { width: `${Math.round(f.pct * 100)}%`, backgroundColor: cor }]}
-                  />
-                </View>
+          <View style={styles.chartWrap}>
+            <Text style={styles.chartTitle}>
+              Evolução de visitantes (últimos 6 meses)
+            </Text>
+            <BarChart data={evolucaoVisitantes} />
+          </View>
+
+          <Text style={styles.secReunioes}>Visitantes do mês</Text>
+          {visitantesList.length === 0 ? (
+            <Text style={styles.empty}>
+              Nenhum visitante registrado neste mês.
+            </Text>
+          ) : (
+            visitantesList.map((v, i) => (
+              <View key={i} style={styles.visitRow}>
+                <Text style={styles.visitNome}>{v.nome}</Text>
+                {v.contato ? (
+                  <Text style={styles.visitContato}>{v.contato}</Text>
+                ) : null}
+                <Text style={styles.visitMeta}>
+                  Reunião: {formatDateBr(v.reuniaoData)}
+                </Text>
               </View>
-            );
-          })}
+            ))
+          )}
+        </>
+      )}
+
+      {/* Aba: Reuniões */}
+      {activeTab === 'reunioes' && (
+        <>
+          {filtradas.length === 0 ? (
+            <Text style={styles.empty}>Nenhuma reunião neste mês.</Text>
+          ) : (
+            filtradas.map((r) => (
+              <TouchableOpacity
+                key={r.id}
+                style={styles.reuniaoRow}
+                onPress={() => openReuniao(r)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.reuniaoData}>
+                  {formatDateBr(r.dataReuniao)}
+                </Text>
+                <Text style={styles.reuniaoTema} numberOfLines={2}>
+                  {r.temaMinistrado || '—'}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
         </>
       )}
     </ScrollView>

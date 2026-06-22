@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { registroMembroSchema } from '../../schemas';
 import { useCelulas } from '../../contexts/CelulasContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUserByEmailAppwrite } from '../../services/appwrite';
+import { getUserByEmailAppwrite, listMembrosByEmailAppwrite } from '../../services/appwrite';
 import { isAppwriteDatabaseConfigured } from '../../lib/appwrite';
 
 export function useRegistroMembroScreen() {
@@ -59,15 +59,37 @@ export function useRegistroMembroScreen() {
         return;
       }
 
-      const usuario = await getUserByEmailAppwrite(email);
+      // allSettled: falha em uma busca não derruba a outra
+      const [usuarioResult, membrosResult] = await Promise.allSettled([
+        getUserByEmailAppwrite(email),
+        listMembrosByEmailAppwrite(email),
+      ]);
 
-      if (usuario) {
-        setValue('nomeCompleto', usuario.nomeCompleto || '');
-        setValue('email', usuario.email || email);
-        setValue('data', usuario.dataNascimento || '');
-        // endereco é string única no perfil — preenche o campo rua para o líder completar
-        if (usuario.endereco) setValue('rua', usuario.endereco);
-        setResultadoBusca({ encontrado: true, nome: usuario.nomeCompleto });
+      const usuario = usuarioResult.status === 'fulfilled' ? usuarioResult.value : null;
+      const membrosExistentes = membrosResult.status === 'fulfilled' ? membrosResult.value : [];
+
+      // Pega o registro de membro mais completo (com telefone preenchido) como fonte de dados
+      const membroRef = membrosExistentes
+        .filter((m) => m.telefone)
+        .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0]
+        ?? membrosExistentes[0];
+
+      if (usuario || membroRef) {
+        setValue('nomeCompleto', usuario?.nomeCompleto || membroRef?.nomeCompleto || '');
+        setValue('email', usuario?.email || membroRef?.email || email);
+        setValue('data', usuario?.dataNascimento || membroRef?.data || '');
+        setValue('telefone', membroRef?.telefone || '');
+        setValue('cpfRg', membroRef?.cpfRg || '');
+        setValue('rua', membroRef?.rua || (usuario?.endereco ?? ''));
+        setValue('numero', membroRef?.numero || '');
+        setValue('complemento', membroRef?.complemento || '');
+        setValue('bairro', membroRef?.bairro || '');
+        setValue('cidade', membroRef?.cidade || '');
+        setValue('cep', membroRef?.cep || '');
+        setResultadoBusca({
+          encontrado: true,
+          nome: usuario?.nomeCompleto || membroRef?.nomeCompleto || '',
+        });
       } else {
         setValue('email', email);
         setResultadoBusca({ encontrado: false });

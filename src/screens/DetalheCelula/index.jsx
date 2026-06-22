@@ -80,14 +80,18 @@ function HeroPlaceholder() {
 export default function DetalheCelula() {
   const {
     celula,
+    liderNome,
     membros,
     reunioes,
     canManage,
     formatDateBr,
     openRelatorio,
+    openEditarCelula,
+    openMembrosCelula,
     openNovaReuniao,
     openDetalheReuniao,
     openRegistroMembro,
+    confirmarRemoverMembro,
     openMenu,
   } = useDetalheCelulaScreen();
 
@@ -114,7 +118,7 @@ export default function DetalheCelula() {
         style={styles.scrollFlex}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
       >
         {/* ── Hero ── */}
         <View style={styles.heroWrap}>
@@ -132,9 +136,25 @@ export default function DetalheCelula() {
 
         {/* ── Info card ── */}
         <View style={styles.infoCard}>
-          <Text style={styles.infoNome} numberOfLines={2}>
-            {celula.nomeCelula}
-          </Text>
+          <View style={styles.infoNomeRow}>
+            <Text style={[styles.infoNome, { flex: 1 }]} numberOfLines={2}>
+              {celula.nomeCelula}
+            </Text>
+            {canManage ? (
+              <TouchableOpacity
+                onPress={openEditarCelula}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Editar célula"
+              >
+                <Text style={styles.editarLink}>Editar</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          {liderNome ? (
+            <Text style={styles.liderNome}>Líder: {liderNome}</Text>
+          ) : null}
+
           <View style={styles.infoMetaRow}>
             {celula.dia ? (
               <View style={styles.infoChip}>
@@ -164,8 +184,15 @@ export default function DetalheCelula() {
         {/* ── Membros ── */}
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeaderRow}>
-            <Text style={styles.sectionTitle}>Membros</Text>
-            <Text style={styles.sectionTitle}>{membros.length}</Text>
+            <View>
+              <Text style={styles.sectionTitle}>Membros ({membros.length})</Text>
+              {canManage && membros.length > 0 ? (
+                <Text style={styles.sectionHint}>Segure para remover</Text>
+              ) : null}
+            </View>
+            <TouchableOpacity onPress={openMembrosCelula} accessibilityRole="button">
+              <Text style={styles.sectionLink}>Ver contatos</Text>
+            </TouchableOpacity>
           </View>
           {membros.length === 0 ? (
             <Text style={styles.sectionEmpty}>
@@ -175,12 +202,17 @@ export default function DetalheCelula() {
             </Text>
           ) : (
             membros.map((m, idx) => (
-              <View
+              <TouchableOpacity
                 key={m.id}
                 style={[
                   styles.membroRow,
                   idx === membros.length - 1 && { borderBottomWidth: 0 },
                 ]}
+                onLongPress={canManage ? () => confirmarRemoverMembro(m) : undefined}
+                delayLongPress={400}
+                activeOpacity={canManage ? 0.7 : 1}
+                accessibilityRole={canManage ? 'button' : 'none'}
+                accessibilityLabel={canManage ? `${m.nomeCompleto} — segure para remover` : m.nomeCompleto}
               >
                 <View style={styles.membroAvatar}>
                   <Text style={styles.membroAvatarText}>{initials(m.nomeCompleto)}</Text>
@@ -191,7 +223,7 @@ export default function DetalheCelula() {
                     <Text style={styles.membroEmail}>{m.email}</Text>
                   ) : null}
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </View>
@@ -253,7 +285,7 @@ export default function DetalheCelula() {
           )}
         </View>
 
-        <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+        <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
       </ScrollView>
 
       {/* ── Bottom bar (só lider/admin) ── */}

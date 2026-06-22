@@ -113,7 +113,7 @@ export default function DetalheReuniao() {
           </TouchableOpacity>
         ) : null}
 
-        <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+        <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
       </ScrollView>
     </SafeAreaView>
   );

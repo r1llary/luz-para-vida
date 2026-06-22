@@ -76,8 +76,12 @@ export function CustomDrawerContent({ navigation }) {
           </>
         )}
 
-        <SectionLabel label="Relatórios" />
-        <NavItem icon="analytics-outline" label="Ver Relatórios" onPress={() => go('RelatoriosTab', 'RelatoriosLista')} />
+        {canManage && (
+          <>
+            <SectionLabel label="Relatórios" />
+            <NavItem icon="analytics-outline" label="Ver Relatórios" onPress={() => go('RelatoriosTab', 'RelatoriosLista')} />
+          </>
+        )}
       </ScrollView>
 
       {/* ── Rodapé ── */}

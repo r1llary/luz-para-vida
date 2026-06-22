@@ -13,8 +13,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Controller } from 'react-hook-form';
 import { Input } from '../../components/Inputs';
 import { Button } from '../../components/Buttons';
-import { styles } from './styles';
-import { useRegistroCelulaScreen } from './useRegistroCelulaScreen';
+import { styles } from '../RegistroCelula/styles';
+import { useEditarCelulaScreen } from './useEditarCelulaScreen';
 
 const DIAS_SEMANA = [
   { abrev: 'Dom', full: 'Domingo' },
@@ -26,8 +26,9 @@ const DIAS_SEMANA = [
   { abrev: 'Sáb', full: 'Sábado' },
 ];
 
-export default function RegistroCelula() {
+export default function EditarCelula() {
   const {
+    celula,
     control,
     handleSubmit,
     errors,
@@ -36,7 +37,9 @@ export default function RegistroCelula() {
     imageUri,
     pickImagem,
     removeImagem,
-  } = useRegistroCelulaScreen();
+  } = useEditarCelulaScreen();
+
+  const previewUri = imageUri ?? celula?.imagemUrl ?? null;
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -54,13 +57,12 @@ export default function RegistroCelula() {
           bounces
         >
           <View style={styles.inner}>
-            {/* ── Imagem de capa ── */}
+            {/* Imagem de capa */}
             <View style={styles.card}>
               <Text style={styles.cardTitle}>Imagem de capa (opcional)</Text>
-
               <TouchableOpacity style={styles.imagemWrap} onPress={pickImagem} activeOpacity={0.85}>
-                {imageUri ? (
-                  <Image source={{ uri: imageUri }} style={styles.imagemPreview} resizeMode="cover" />
+                {previewUri ? (
+                  <Image source={{ uri: String(previewUri) }} style={styles.imagemPreview} resizeMode="cover" />
                 ) : (
                   <View style={styles.imagemPlaceholder}>
                     <View style={styles.imagemPlaceholderIcon}>
@@ -70,8 +72,7 @@ export default function RegistroCelula() {
                   </View>
                 )}
               </TouchableOpacity>
-
-              {imageUri ? (
+              {previewUri ? (
                 <View style={styles.imagemAcoes}>
                   <TouchableOpacity style={styles.imagemBtn} onPress={pickImagem} activeOpacity={0.85}>
                     <Text style={styles.imagemBtnText}>Trocar foto</Text>
@@ -83,9 +84,9 @@ export default function RegistroCelula() {
               ) : null}
             </View>
 
-            {/* ── Informações principais ── */}
+            {/* Informações */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Informações principais</Text>
+              <Text style={styles.cardTitle}>Informações da célula</Text>
               <Controller
                 control={control}
                 name="nomeCelula"
@@ -161,7 +162,7 @@ export default function RegistroCelula() {
               <View style={styles.btnWrap}>
                 <Button
                   variant="accent"
-                  title="CADASTRAR"
+                  title="SALVAR ALTERAÇÕES"
                   onPress={handleSubmit(onSubmit)}
                   loading={submitting}
                 />

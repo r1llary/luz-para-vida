@@ -1,0 +1,115 @@
+@startuml Luz para Vida - Diagrama de Caso de Uso
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam packageBorderColor #1A3A6B
+skinparam packageBackgroundColor #F8FAFF
+skinparam usecaseBorderColor #1A3A6B
+skinparam usecaseBackgroundColor #EFF6FF
+skinparam usecaseFontSize 11
+skinparam actorBorderColor #1A3A6B
+skinparam actorFontSize 12
+skinparam arrowColor #1A3A6B
+skinparam defaultFontName Arial
+
+left to right direction
+
+title Diagrama de Caso de Uso — Luz para Vida
+
+' ── Atores ──────────────────────────────────────────────
+actor "Membro"      as membro
+actor "Líder"       as lider
+actor "Admin"       as admin
+actor "Google Maps" as maps #LightGray
+
+lider -up-|> membro
+admin -up-|> lider
+
+' ── Sistema ─────────────────────────────────────────────
+rectangle "Sistema — Luz para Vida" {
+
+  package "Autenticação" as A {
+    usecase "Fazer Login"     as UC01
+    usecase "Cadastrar Conta" as UC02
+    usecase "Sair da Conta"   as UC03
+  }
+
+  package "Perfil" as B {
+    usecase "Visualizar Perfil"        as UC04
+    usecase "Editar Dados Pessoais"    as UC05
+    usecase "Gerenciar Foto de Perfil" as UC06
+  }
+
+  package "Células" as C {
+    usecase "Visualizar Lista de Células"   as UC07
+    usecase "Visualizar Detalhes da Célula" as UC08
+    usecase "Cadastrar Nova Célula"         as UC09
+    usecase "Abrir Endereço no Maps"        as UC10
+  }
+
+  package "Membros" as D {
+    usecase "Visualizar Membros da Célula" as UC11
+    usecase "Cadastrar Membro na Célula"   as UC12
+  }
+
+  package "Reuniões" as E {
+    usecase "Visualizar Reuniões da Célula"  as UC13
+    usecase "Visualizar Detalhes de Reunião" as UC14
+    usecase "Registrar Nova Reunião"         as UC15
+    usecase "Editar Reunião"                 as UC16
+    usecase "Marcar Presença de Membros"     as UC17
+    usecase "Registrar Visitantes"           as UC18
+  }
+
+  package "Relatórios" as F {
+    usecase "Visualizar Relatório Mensal" as UC19
+    usecase "Filtrar por Mês e Ano"       as UC20
+    usecase "Ver Frequência de Membros"   as UC21
+  }
+
+  package "Administração" as G {
+    usecase "Gerenciar Usuários"           as UC22
+    usecase "Alterar Permissão de Usuário" as UC23
+  }
+
+}
+
+' ── Associações — Membro ────────────────────────────────
+membro --> UC01
+membro --> UC02
+membro --> UC03
+membro --> UC04
+membro --> UC05
+membro --> UC07
+membro --> UC08
+membro --> UC10
+membro --> UC11
+membro --> UC13
+membro --> UC14
+
+' ── Associações — Líder (adicionais) ───────────────────
+lider --> UC09
+lider --> UC12
+lider --> UC15
+lider --> UC16
+lider --> UC19
+
+' ── Associações — Admin (adicionais) ───────────────────
+admin --> UC22
+
+' ── Ator externo ────────────────────────────────────────
+UC10 --> maps
+
+' ── <<include>> ─────────────────────────────────────────
+UC05 .> UC06 : <<include>>
+UC19 .> UC20 : <<include>>
+UC19 .> UC21 : <<include>>
+UC22 .> UC23 : <<include>>
+
+' ── <<extend>> ──────────────────────────────────────────
+UC17 .> UC15 : <<extend>>
+UC18 .> UC15 : <<extend>>
+UC17 .> UC16 : <<extend>>
+UC18 .> UC16 : <<extend>>
+
+@enduml

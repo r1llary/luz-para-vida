@@ -14,6 +14,7 @@ import { Input } from '../../components/Inputs';
 import { Button } from '../../components/Buttons';
 import { styles } from '../NovaReuniao/styles';
 import { useEditarReuniaoScreen } from './useEditarReuniaoScreen';
+import { maskDateInput } from '../../utils/date';
 
 export default function EditarReuniao() {
   const {
@@ -68,9 +69,11 @@ export default function EditarReuniao() {
                     variant="auth"
                     placeholder="Data (DD/MM/AAAA)"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(maskDateInput(text))}
                     onBlur={onBlur}
                     error={errors.dataReuniao?.message}
+                    keyboardType="numeric"
+                    maxLength={10}
                   />
                 )}
               />
@@ -237,7 +240,7 @@ export default function EditarReuniao() {
             </View>
           </View>
 
-          <Text style={styles.footer}>Luz para Vida · Camila Guimaraes</Text>
+          <Text style={styles.footer}>Luz para Vida · Ana Rillary</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
